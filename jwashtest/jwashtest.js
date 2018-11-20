@@ -1,6 +1,6 @@
-// title:  game title
-// author: game developer
-// desc:   short description
+// title:  jwash test
+// author: jwash
+// desc:   a test
 // script: js
 
 var t = 0
