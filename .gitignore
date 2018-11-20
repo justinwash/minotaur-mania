@@ -328,3 +328,8 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+# TIC-80 Binaries
+TIC-80.exe
+tic80
+TIC-80.app
