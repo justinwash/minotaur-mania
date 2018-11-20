@@ -13,8 +13,9 @@ hehe xD
 - npm start 
 # Get it Running on windows (fuck node)
 
-- Run the shortcut, "TIC-80 - Local Storage". This will open a terminal on the current directory.
-    - Navigate to your directory.
+- Add TIC-80 to your PATH
+- Run "TIC-80 ." if the executable is stored in your local copy of this repo. 
+    If not, you'll need to navigate to the repo directory with "cd /.." to escape TIC-80's safe-zone.
 - Load your script, and run
 
         load [YOUR_SCRIPT].tic
