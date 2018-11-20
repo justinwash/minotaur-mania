@@ -32,3 +32,5 @@ function moveShip() {
   if (btn(2)) ship.x--;
   if (btn(3)) ship.x++;
 }
+
+function fire() {}
