@@ -1,0 +1,19 @@
+{
+  "name": "ld43",
+  "version": "1.0.0",
+  "description": "Ludum Dare 43 Entry",
+  "main": "index.js",
+  "scripts": {
+    "start": "TIC-80.exe ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Trifectuh/ld43.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Trifectuh/ld43/issues"
+  },
+  "homepage": "https://github.com/Trifectuh/ld43#readme"
+}
