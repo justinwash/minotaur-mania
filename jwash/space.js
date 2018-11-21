@@ -2,8 +2,10 @@
 
 var ship = {
   sp: 0,
-  x: 112,
-  y: 92
+  x: 180,
+  y: 120,
+  health: 3,
+  points: 0
 };
 
 var bullets = [];
@@ -17,6 +19,7 @@ function TIC() {
 
 function _draw() {
   spr(ship.sp, ship.x, ship.y);
+  drawUI();
 }
 
 function _update() {
@@ -26,6 +29,7 @@ function _update() {
   animateBullets();
   drawEnemies();
   moveEnemies();
+  killEnemies();
 }
 
 function animatePropulsion() {
@@ -47,7 +51,8 @@ function fire() {
       x: ship.x,
       y: ship.y,
       dx: 0,
-      dy: -3
+      dy: -3,
+      active: true
     };
     bullets.push(bullet);
   }
@@ -75,6 +80,7 @@ function initEnemies() {
   for (i = 0; i < 10; i++) {
     e.push({
       sp: 3,
+      alive: true,
       x: i * Math.random() * (24 + i),
       y: i * Math.random() * 10
     });
@@ -88,11 +94,46 @@ function moveEnemies() {
     enemies[i].y += 0.33 * Math.cos(enemies[i].x);
   }
 }
+
+function drawUI() {
+  for (i = 1; i <= 4; i++) {
+    if (i <= ship.health) {
+      spr(16, 208 + 6 * i, 3);
+    } else spr(17, 208 + 6 * i, 3);
+  }
+  print(ship.points, 3, 3, 15);
+}
+
+function collide(thing1, thing2) {
+  var xDiff = (thing1.x + 100) / (thing2.x + 100);
+  var yDiff = (thing1.y + 100) / (thing2.y + 100);
+
+  if (xDiff >= 0.95 && xDiff <= 1.05 && yDiff >= 0.95 && yDiff <= 1.05) {
+    return true;
+  } else return false;
+}
+
+function killEnemies() {
+  for (e = 0; e < enemies.length; e++) {
+    for (b = 0; b < bullets.length; b++) {
+      if (collide(enemies[e], bullets[b]) && bullets[b].active) {
+        enemies[e].alive = false;
+        bullets[b].active = false;
+        ship.points++;
+      }
+    }
+  }
+}
+
+function hurtShip() {}
+
 // <TILES>
 // 000:000000000060060000a00a0000aaaa0003a33a3003aaaa3003009030000e0000
 // 001:000000000060060000a00a0000aaaa0003a33a3003aaaa30030900300000e000
 // 002:0006600000066000000660000000000000000000000000000000000000000000
 // 003:0000000000000000005bb00005fbfb00051b1b005bbbbb0b505bb550b000b000
+// 016:0606000066666000066600000060000000000000000000000000000000000000
+// 017:0a0a0000aaaaa0000aaa000000a0000000000000000000000000000000000000
 // </TILES>
 
 // <WAVES>
