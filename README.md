@@ -13,7 +13,7 @@ hehe xD
 
 - npm start
 
-# Get it Running on windows (fuck node)
+# Get it Running on windows (f**k node)
 
 - Add TIC-80 to your PATH
 - Run "TIC-80 ." if the executable is stored in your local copy of this repo.
