@@ -1,7 +1,6 @@
--- title:  Raycast Lua
--- author: jwash
--- desc:   a raycasting engine that probably doesn't work
-
+-- title:  game title
+-- author: game developer
+-- desc:   short description
 -- script: lua
 
 screen = {
@@ -49,7 +48,7 @@ player = {
 		x = 0,
 		y = 0.66
 	},
-	map = {
+	mapPos = {
 		x = 22,
 		y = 11
 	},
@@ -92,7 +91,7 @@ column = {
 	color = 0
 }
 
-function TIC() 
+function TIC()
 	cls()
 
 	for x = 0, screen.width - 1, 1 do
@@ -103,9 +102,7 @@ function TIC()
 		calculateRayStepSize()
 
 		ray.wall.hit = false
-		while (ray.wall.hit == false) do
-			findWall()
-		end
+		findWall()
 
 		calculateWallDistance()
 		calculateColumnHeight()
@@ -116,70 +113,71 @@ function TIC()
 	movePlayer()
 end
 
-function createRay(x) 
+function createRay(x)
 	local cameraX = (2 * x) / screen.width - 1
 	ray.dir.x = player.dir.x + player.cam.x * cameraX
 	ray.dir.y = player.dir.y + player.cam.y * cameraX
 end
 
-function setPlayerMapPosition() 
-	player.map.x = Math.trunc(player.pos.x)
-	player.map.y = Math.trunc(player.pos.y)
+function setPlayerMapPosition()
+	player.mapPos.x = math.floor(player.pos.x)
+	player.mapPos.y = math.floor(player.pos.y)
 end
 
-function calculateRayDistance() 
-	ray.dist.dx = Math.abs(1 / ray.dir.x)
-	ray.dist.dy = Math.abs(1 / ray.dir.y)
+function calculateRayDistance()
+	ray.dist.dx = math.abs(1 / ray.dir.x)
+	ray.dist.dy = math.abs(1 / ray.dir.y)
 end
 
-function calculateRayStepSize() 
+function calculateRayStepSize()
 	if (ray.dir.x < 0) then
 		ray.step.x = -1
-		ray.dist.x = (player.pos.x - player.map.x) * ray.dist.dx
+		ray.dist.x = (player.pos.x - player.mapPos.x) * ray.dist.dx
 	else
 		ray.step.x = 1
-		ray.dist.x = (player.map.x + 1.0 - player.pos.x) * ray.dist.dx
+		ray.dist.x = (player.mapPos.x + 1.0 - player.pos.x) * ray.dist.dx
 	end
 	if (ray.dir.y < 0) then
 		ray.step.y = -1
-		ray.dist.y = (player.pos.y - player.map.y) * ray.dist.dy
-	else 
+		ray.dist.y = (player.pos.y - player.mapPos.y) * ray.dist.dy
+	else
 		ray.step.y = 1
-		ray.dist.y = (player.map.y + 1.0 - player.pos.y) * ray.dist.dy
+		ray.dist.y = (player.mapPos.y + 1.0 - player.pos.y) * ray.dist.dy
 	end
 end
 
-function findWall() 
-	if (ray.dist.x < ray.dist.y) then
-		ray.dist.x = ray.dist.x + ray.dist.dx
-		player.map.x = ray.dist.x + ray.step.x
-		ray.wall.side = 0
-	else 
-		ray.dist.y = ray.dist.y + ray.dist.dy
-		player.map.y = ray.dist.y + ray.step.y
-		ray.wall.side = 1
-	end
+function findWall()
+	while (ray.wall.hit == true) do
+		if (ray.dist.x < ray.dist.y) then
+			ray.dist.x = ray.dist.x + ray.dist.dx
+			player.mapPos.x = ray.dist.x + ray.step.x
+			ray.wall.side = 0
+		else
+			ray.dist.y = ray.dist.y + ray.dist.dy
+			player.mapPos.y = ray.dist.y + ray.step.y
+			ray.wall.side = 1
+		end
 
-	if (worldMap[player.map.x][player.map.y] > 0) then
-		ray.wall.hit = true
+		if (worldMap[player.mapPos.x][player.mapPos.y] > 0) then
+			ray.wall.hit = true
+		end
 	end
+end
 
 function calculateWallDistance()
 	if (ray.wall.side == 0) then
-		ray.dist.perp =
-			(player.map.x - player.pos.x + (1 - ray.step.x) / 2) / ray.dir.x
+		ray.dist.perp = (player.mapPos.x - player.pos.x + (1 - ray.step.x) / 2) / ray.dir.x
 	else
-		ray.dist.perp =
-			(player.map.y - player.pos.y + (1 - ray.step.y) / 2) / ray.dir.y
+		ray.dist.perp = (player.mapPos.y - player.pos.y + (1 - ray.step.y) / 2) / ray.dir.y
 	end
 end
 
-function calculateColumnHeight() 
+function calculateColumnHeight()
 	column.height = screen.height / ray.dist.perp
 
 	column.top = -column.height / 2 + screen.height / 2
-	if (column.top < 0) then 
-		column.top = 0 
+	if (column.top < 0) then
+		column.top = 0
 	end
 
 	column.bottom = column.height / 2 + screen.height / 2
@@ -188,8 +186,8 @@ function calculateColumnHeight()
 	end
 end
 
-function drawColumn(x) 
-	column.color = worldMap[player.map.x][player.map.y]
+function drawColumn(x)
+	column.color = worldMap[player.mapPos.x][player.mapPos.y]
 
 	if (ray.wall.side == 1) then
 		column.color = column.color + 5
@@ -198,53 +196,53 @@ function drawColumn(x)
 	line(x, column.top, x, column.bottom, column.color)
 end
 
-function updateFpsCounter() 
+function updateFpsCounter()
 	timer.old = timer.current
 	timer.current = time()
 	timer.lastFrame = (timer.current - timer.old) / 1000.0
-	print(Math.trunc(1.0 / timer.lastFrame))
+	print(math.floor(1.0 / timer.lastFrame))
 end
 
-function movePlayer() 
+function movePlayer()
 	local moveSpeedDelta = timer.lastFrame * player.moveSpeed
 	local rotationSpeedDelta = timer.lastFrame * player.rotationSpeed
 
 	if (btn(0)) then
-		if (worldMap[Math.trunc(player.pos.x + player.dir.x * moveSpeedDelta)][Math.trunc(player.pos.y)] == 0) then
+		if (worldMap[math.floor(player.pos.x + player.dir.x * moveSpeedDelta)][math.floor(player.pos.y)] == 0) then
 			player.pos.x = player.pos.x + (player.dir.x * moveSpeedDelta)
 		end
-		if (worldMap[Math.trunc(player.pos.x)][Math.trunc(player.pos.y + player.dir.y * moveSpeedDelta)] == 0) then
+		if (worldMap[math.floor(player.pos.x)][math.floor(player.pos.y + player.dir.y * moveSpeedDelta)] == 0) then
 			player.pos.y = player.pos.y + (player.dir.y * moveSpeedDelta)
 		end
 	end
 
 	if (btn(1)) then
-		if (worldMap[Math.trunc(player.pos.x - player.dir.x * moveSpeedDelta)][Math.trunc(player.pos.y)] == 0) then
+		if (worldMap[math.floor(player.pos.x - player.dir.x * moveSpeedDelta)][math.floor(player.pos.y)] == 0) then
 			player.pos.x = player.pos.x - (player.dir.x * moveSpeedDelta)
 		end
-		if (worldMap[Math.trunc(player.pos.x)][Math.trunc(player.pos.y - player.dir.y * moveSpeedDelta)] == 0) then
+		if (worldMap[math.floor(player.pos.x)][math.floor(player.pos.y - player.dir.y * moveSpeedDelta)] == 0) then
 			player.pos.y = player.pos.y - (player.dir.y * moveSpeedDelta)
 		end
 	end
 
 	if (btn(2)) then
 		local oldDirX = player.dir.x
-		player.dir.x = player.dir.x * Math.cos(rotationSpeedDelta) - player.dir.y * Math.sin(rotationSpeedDelta)
-		player.dir.y = oldDirX * Math.sin(rotationSpeedDelta) + player.dir.y * Math.cos(rotationSpeedDelta)
-		
+		player.dir.x = player.dir.x * math.cos(rotationSpeedDelta) - player.dir.y * math.sin(rotationSpeedDelta)
+		player.dir.y = oldDirX * math.sin(rotationSpeedDelta) + player.dir.y * math.cos(rotationSpeedDelta)
+
 		local oldPlaneX = player.cam.x
-		player.cam.x = player.cam.x * Math.cos(rotationSpeedDelta) - player.cam.y * Math.sin(rotationSpeedDelta)
-		player.cam.y = oldPlaneX * Math.sin(rotationSpeedDelta) + player.cam.y * Math.cos(rotationSpeedDelta)
+		player.cam.x = player.cam.x * math.cos(rotationSpeedDelta) - player.cam.y * math.sin(rotationSpeedDelta)
+		player.cam.y = oldPlaneX * math.sin(rotationSpeedDelta) + player.cam.y * math.cos(rotationSpeedDelta)
 	end
 
 	if (btn(3)) then
 		local oldDirX = player.dir.x
-		player.dir.x = player.dir.x * Math.cos(-rotationSpeedDelta) - player.dir.y * Math.sin(-rotationSpeedDelta)
-		player.dir.y = oldDirX * Math.sin(-rotationSpeedDelta) + player.dir.y * Math.cos(-rotationSpeedDelta)
-		
-			local oldPlaneX = player.cam.x
-		player.cam.x = player.cam.x * Math.cos(-rotationSpeedDelta) - player.cam.y * Math.sin(-rotationSpeedDelta)
-		player.cam.y = oldPlaneX * Math.sin(-rotationSpeedDelta) + player.cam.y * Math.cos(-rotationSpeedDelta)
+		player.dir.x = player.dir.x * math.cos(-rotationSpeedDelta) - player.dir.y * math.sin(-rotationSpeedDelta)
+		player.dir.y = oldDirX * math.sin(-rotationSpeedDelta) + player.dir.y * math.cos(-rotationSpeedDelta)
+
+		local oldPlaneX = player.cam.x
+		player.cam.x = player.cam.x * math.cos(-rotationSpeedDelta) - player.cam.y * math.sin(-rotationSpeedDelta)
+		player.cam.y = oldPlaneX * math.sin(-rotationSpeedDelta) + player.cam.y * math.cos(-rotationSpeedDelta)
 	end
 end
 
