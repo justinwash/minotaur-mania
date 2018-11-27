@@ -1,6 +1,6 @@
--- title:  game title
--- author: game developer
--- desc:   short description
+-- title:  Raycast Lua
+-- author: jwash
+-- desc:   a raycast engine in lua
 -- script: lua
 
 screen = {
@@ -78,6 +78,10 @@ ray = {
 		x = 1,
 		y = 1
 	},
+	mapPos = {
+		x = 22,
+		y = 11
+	},
 	wall = {
 		hit = false,
 		side = 1
@@ -94,15 +98,21 @@ column = {
 function TIC()
 	cls()
 
-	for x = 0, screen.width - 1, 1 do
+	rect(0, 0, 240, 68, 13)
+	rect(0, 69, 240, 136, 12)
+
+	for x = 0, screen.width, 1 do
 		createRay(x)
 
 		setPlayerMapPosition()
+		setRayMapPosition()
 		calculateRayDistance()
 		calculateRayStepSize()
 
 		ray.wall.hit = false
-		findWall()
+		while (ray.wall.hit == false) do
+			findWall()
+		end
 
 		calculateWallDistance()
 		calculateColumnHeight()
@@ -122,6 +132,11 @@ end
 function setPlayerMapPosition()
 	player.mapPos.x = math.floor(player.pos.x)
 	player.mapPos.y = math.floor(player.pos.y)
+end
+
+function setRayMapPosition()
+	ray.mapPos.x = math.floor(player.pos.x)
+	ray.mapPos.y = math.floor(player.pos.y)
 end
 
 function calculateRayDistance()
@@ -147,28 +162,27 @@ function calculateRayStepSize()
 end
 
 function findWall()
-	while (ray.wall.hit == true) do
-		if (ray.dist.x < ray.dist.y) then
-			ray.dist.x = ray.dist.x + ray.dist.dx
-			player.mapPos.x = ray.dist.x + ray.step.x
-			ray.wall.side = 0
-		else
-			ray.dist.y = ray.dist.y + ray.dist.dy
-			player.mapPos.y = ray.dist.y + ray.step.y
-			ray.wall.side = 1
-		end
+	if (ray.dist.x < ray.dist.y) then
+		ray.dist.x = ray.dist.x + ray.dist.dx
+		ray.mapPos.x = ray.mapPos.x + ray.step.x
+		ray.wall.side = 0
+	else
+		ray.dist.y = ray.dist.y + ray.dist.dy
+		ray.mapPos.y = ray.mapPos.y + ray.step.y
+		ray.wall.side = 1
+	end
 
-		if (worldMap[player.mapPos.x][player.mapPos.y] > 0) then
-			ray.wall.hit = true
-		end
+	if (worldMap[ray.mapPos.x][ray.mapPos.y] > 0) then
+		ray.wall.hit = true
+		return
 	end
 end
 
 function calculateWallDistance()
 	if (ray.wall.side == 0) then
-		ray.dist.perp = (player.mapPos.x - player.pos.x + (1 - ray.step.x) / 2) / ray.dir.x
+		ray.dist.perp = (ray.mapPos.x - player.pos.x + (1 - ray.step.x) / 2) / ray.dir.x
 	else
-		ray.dist.perp = (player.mapPos.y - player.pos.y + (1 - ray.step.y) / 2) / ray.dir.y
+		ray.dist.perp = (ray.mapPos.y - player.pos.y + (1 - ray.step.y) / 2) / ray.dir.y
 	end
 end
 
@@ -187,7 +201,7 @@ function calculateColumnHeight()
 end
 
 function drawColumn(x)
-	column.color = worldMap[player.mapPos.x][player.mapPos.y]
+	column.color = worldMap[ray.mapPos.x][ray.mapPos.y]
 
 	if (ray.wall.side == 1) then
 		column.color = column.color + 5
