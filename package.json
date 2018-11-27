@@ -4,7 +4,7 @@
   "description": "Ludum Dare 43 Entry",
   "main": "index.js",
   "scripts": {
-    "start": "TIC-80.exe ."
+    "start": "tic80.exe ."
   },
   "repository": {
     "type": "git",
