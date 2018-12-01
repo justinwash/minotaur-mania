@@ -55,10 +55,16 @@ const player = {
   move: function() {
     if (!this.halted) {
       if (this.canMoveDir("u")) {
-        if (btn(0)) this.dy -= 0.5;
+        if (btn(0)) {
+          this.dy -= 0.5;
+          this.facing = "u";
+        }
       }
       if (this.canMoveDir("d")) {
-        if (btn(1)) this.dy += 0.5;
+        if (btn(1)) {
+          this.dy += 0.5;
+          this.facing = "d";
+        }
       }
       if (this.canMoveDir("l")) {
         if (btn(2)) {
@@ -110,6 +116,18 @@ const player = {
       axe.x = player.x - 8;
       axe.y = player.y - 2;
       axe.flip = 1;
+    }
+
+    if (player.facing == "u") {
+      axe.x = player.x + 2;
+      axe.y = player.y - 5;
+      axe.flip = 3;
+    }
+
+    if (player.facing == "d") {
+      axe.x = player.x + 2;
+      axe.y = player.y + 6;
+      axe.flip = 4;
     }
 
     if (btn(4) && axe.cooldown <= 0) {
