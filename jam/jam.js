@@ -229,4 +229,3 @@ function updatePlayer() {
 // <PALETTE>
 // 000:140c1cb2bab230346d847e6f854c30346524d04648757161597dced27d2c8595a16daa2cd2aa996dc2cadad45edeeed6
 // </PALETTE>
-
