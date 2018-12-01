@@ -1,24 +1,24 @@
-// title:  jam game
-// author: team name???
-// desc:   whoooooo fuckin knows
+// title:  minotaur mania
+// author: cyberhunk studios
+// desc:   sacrifices must be made
 // script: js
 
 var x = 212;
 var y = 04;
 
 function TIC() {
-	if (btn(0)) y--;
-	if (btn(1)) y++;
-	if (btn(2)) x--;
-	if (btn(3)) x++;
+  if (btn(0)) y--;
+  if (btn(1)) y++;
+  if (btn(2)) x--;
+  if (btn(3)) x++;
 
-	cls();
-	spr(0, x, y, 14, 3, 0, 0, 1, 1);
+  cls();
+  spr(0, x, y, 14, 3, 0, 0, 1, 1);
 }
 
-// <TILES>
+// <SPRITES>
 // 000:000f00f0001111f0006f1ff00011114000114110014444100043440001111100
-// </TILES>
+// </SPRITES>
 
 // <WAVES>
 // 000:00000000ffffffff00000000ffffffff
