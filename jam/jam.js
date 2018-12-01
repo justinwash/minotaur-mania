@@ -3,6 +3,26 @@
 // desc:   sacrifices must be made
 // script: js
 
+class Dimen {
+	constructor(w, h) {
+		this.w = w
+		this.h = h
+	}
+}
+
+class Entity {
+	constructor(type, x, y, dimen) {
+		this.type = type
+		this.x = x
+		this.y = y
+		this.dimen = dimen
+	}
+}
+
+var entities = [
+	Entity(type = "player", x = 212, y = 4, dimen = Dimen(6, 6))
+]
+
 var x = 212;
 var y = 04;
 
@@ -14,6 +34,14 @@ function TIC() {
 
     cls();
     spr(0, x, y, 14, 3, 0, 0, 1, 1);
+
+	if (btnp(4, 40, 1)) {
+		attack()
+	}
+}
+
+function attack() {
+	print("4: 'A' pressed")
 }
 
 // <TILES>
