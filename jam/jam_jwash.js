@@ -33,36 +33,28 @@ var wallSpr = 352;
 
 function drawTestmap() {
 	for (i = 0; i < testMap.length; i++) {
-		for (x = 0; x < testMap[i].length; x++) {
-			if (testMap[i][x] == 1) spr(wallSpr, x * 4, i * 4);
+		for (x = 0; x < testMap[i].length; i++) {
+			spr(wallSpr, i * 4, x * 4);
 		}
 	}
 }
 
 const player = {
-	x: 24,
-	y: 8,
+	x: 228,
+	y: 4,
 	dx: 0,
 	dy: 0,
-	spr: 256,
+	spr: 272,
 	lives: 3,
 	health: 100,
 	speed: 1,
 	halted: false,
 	move: function() {
 		if (!this.halted) {
-			if (this.canMoveDir('u')) {
-				if (btn(0)) this.dy -= 0.5;
-			}
-			if (this.canMoveDir('d')) {
-				if (btn(1)) this.dy += 0.5;
-			}
-			if (this.canMoveDir('l')) {
-				if (btn(2)) this.dx -= 0.5;
-			}
-			if (this.canMoveDir('r')) {
-				if (btn(3)) this.dx += 0.5;
-			}
+			if (btn(0)) this.dy--;
+			if (btn(1)) this.dy++;
+			if (btn(2)) this.dx--;
+			if (btn(3)) this.dx++;
 
 			this.x += this.dx;
 			this.y += this.dy;
@@ -71,36 +63,6 @@ const player = {
 	stop: function() {
 		this.dx = 0;
 		this.dy = 0;
-	},
-	canMoveDir(direction) {
-		if (direction == 'l') {
-			if (
-				pix(player.x - 1, player.y) == 0 &&
-				pix(player.x - 1, player.y + 6) == 0
-			)
-				return true;
-		}
-		if (direction == 'r') {
-			if (
-				pix(player.x + 6, player.y) == 0 &&
-				pix(player.x + 6, player.y + 6) == 0
-			)
-				return true;
-		}
-		if (direction == 'u') {
-			if (
-				pix(player.x, player.y - 1) == 0 &&
-				pix(player.x + 6, player.y - 1) == 0
-			)
-				return true;
-		}
-		if (direction == 'd') {
-			if (
-				pix(player.x, player.y + 6) == 0 &&
-				pix(player.x + 6, player.y + 6) == 0
-			)
-				return true;
-		}
 	}
 };
 
@@ -108,7 +70,7 @@ function TIC() {
 	cls();
 	drawTestmap();
 	updatePlayer();
-	spr(player.spr, player.x, player.y, 0);
+	spr(player.spr, player.x, player.y);
 }
 
 function updatePlayer() {
@@ -116,20 +78,13 @@ function updatePlayer() {
 	player.move();
 }
 
-// <TILES>
-// 000:3773777777773773337737737733377373373733377333733373773337337733
-// </TILES>
-
 // <SPRITES>
-// 000:ffffff0000440000444444000444400004444000040040000000000000000000
+// 000:ffff000004400000444400000440000000000000000000000000000000000000
 // 001:000000000cc00cc08888eeee08800ee0000000000cc00cc06666999906600990
 // 002:000000000cc00cc02222dddd02200dd0000000000cc00cc0bbbb55550bb00550
 // 003:00000000044004408888eeee08800ee000000000044004406666999906600990
 // 004:00000000044004402222dddd02200dd00000000004400440bbbb55550bb00550
-// 096:4444000044440000444400004444000000000000000000000000000000000000
-// 005:0cc00440a9eaa9ea0e900e900aa00aa00cc00440a6faa6fa0f600f600aa00aa0
-// 006:0cc00440af2aaf2a02f002f00aa00aa00cc00440ab5aab5a05b005b00aa00aa0
-// 016:4110000041100000401000004000000040000000400000000000000000000000
+// 016:ffffff0000440000444444000444400004444000040040000000000000000000
 // </SPRITES>
 
 // <WAVES>
@@ -143,5 +98,6 @@ function updatePlayer() {
 // </SFX>
 
 // <PALETTE>
-// 000:140c1cb2bab230346d847e6f854c30346524d04648757161597dced27d2c8595a16daa2cd2aa996dc2cadad45edeeed6
+// 000:140c1c44243430346d4e4a4e854c30346524d04648757161597dced27d2c8595a16daa2cd2aa996dc2cadad45edeeed6
 // </PALETTE>
+
