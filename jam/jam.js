@@ -157,10 +157,12 @@ const axe = {
 };
 
 function TIC() {
-  cls();
-  drawTestmap();
-  updatePlayer();
-  spr(player.spr, player.x, player.y, 0);
+	cls();
+	//drawTestmap();
+	//most params are default, just manually entered them cuz not sure what they all did tbh
+	map(0,0,30,17,0,0,-1,1,null);
+	updatePlayer();
+	spr(player.spr, player.x, player.y, 0);
 }
 
 function updatePlayer() {
@@ -189,6 +191,7 @@ function updatePlayer() {
 // 004:00000000044004402222dddd02200dd00000000004400440bbbb55550bb00550
 // 005:0cc00440a9eaa9ea0e900e900aa00aa00cc00440a6faa6fa0f600f600aa00aa0
 // 006:0cc00440af2aaf2a02f002f00aa00aa00cc00440ab5aab5a05b005b00aa00aa0
+// 007:000000000000000000000000000ee000000ee000000000000000000000000000
 // 016:4110000041100000401000004000000040000000400000000000000000000000
 // 017:0000000000000000000000000000000044444400000011000001110000000000
 // 096:4444000044440000444400004444000000000000000000000000000000000000
@@ -226,3 +229,4 @@ function updatePlayer() {
 // <PALETTE>
 // 000:140c1cb2bab230346d847e6f854c30346524d04648757161597dced27d2c8595a16daa2cd2aa996dc2cadad45edeeed6
 // </PALETTE>
+
