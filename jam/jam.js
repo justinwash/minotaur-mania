@@ -76,28 +76,28 @@ const player = {
 		if (direction == 'l') {
 			if (
 				pix(player.x - 1, player.y) == 0 &&
-				pix(player.x - 1, player.y + 6) == 0
+				pix(player.x - 1, player.y + 5) == 0
 			)
 				return true;
 		}
 		if (direction == 'r') {
 			if (
 				pix(player.x + 6, player.y) == 0 &&
-				pix(player.x + 6, player.y + 6) == 0
+				pix(player.x + 6, player.y + 5) == 0
 			)
 				return true;
 		}
 		if (direction == 'u') {
 			if (
 				pix(player.x, player.y - 1) == 0 &&
-				pix(player.x + 6, player.y - 1) == 0
+				pix(player.x + 5, player.y - 1) == 0
 			)
 				return true;
 		}
 		if (direction == 'd') {
 			if (
 				pix(player.x, player.y + 6) == 0 &&
-				pix(player.x + 6, player.y + 6) == 0
+				pix(player.x + 5, player.y + 6) == 0
 			)
 				return true;
 		}
