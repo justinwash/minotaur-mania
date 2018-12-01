@@ -7,13 +7,13 @@ var x = 212;
 var y = 04;
 
 function TIC() {
-  if (btn(0)) y--;
-  if (btn(1)) y++;
-  if (btn(2)) x--;
-  if (btn(3)) x++;
+    if (btn(0)) y--;
+    if (btn(1)) y++;
+    if (btn(2)) x--;
+    if (btn(3)) x++;
 
-  cls();
-  spr(0, x, y, 14, 3, 0, 0, 1, 1);
+    cls();
+    spr(0, x, y, 14, 3, 0, 0, 1, 1);
 }
 
 // <TILES>
@@ -44,4 +44,3 @@ function TIC() {
 // <PALETTE>
 // 000:140c1cb2bab230346d847e6f854c30346524d04648757161597dced27d2c8595a16daa2cd2aa996dc2cadad45edeeed6
 // </PALETTE>
-
