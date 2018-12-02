@@ -40,15 +40,13 @@ function drawTestmap() {
 	}
 }
 
-<<<<<<< HEAD
 const gameState = {
-	title: true,
+	title: false,
 	play: true,
 	difficulty: 0.1,
 	waveCleared: false,
 	gameOver: false
 };
-=======
 const sacs = []
 
 const sac = {
@@ -117,11 +115,10 @@ function populateSacs() {
 		sacs[i] = sac;
 	}
 }
->>>>>>> fc1184d6a2b8bc9ee3770694f909fdf00288d37d
 
 const waveTimer = {
 	remaining: 3600, //60sec at 60fps
-	tick: function(rate) {
+	tick: function (rate) {
 		this.remaining = this.remaining - rate;
 	}
 };
@@ -138,7 +135,7 @@ const player = {
 	attacking: false,
 	speed: 1,
 	halted: false,
-	move: function() {
+	move: function () {
 		if (!this.halted) {
 			if (this.canMoveDir('u')) {
 				if (btn(0)) {
@@ -169,7 +166,7 @@ const player = {
 			this.y += this.dy;
 		}
 	},
-	stop: function() {
+	stop: function () {
 		this.dx = 0;
 		this.dy = 0;
 	},
@@ -239,31 +236,26 @@ const axe = {
 	spr: [272],
 	rotation: [0, 0],
 	flip: 0,
-	hitEnemy: function() {
+	hitEnemy: function () {
 		//do stuff
 	},
 	cooldown: 0
 };
 
-<<<<<<< HEAD
 function drawTitleScreen() {
 	cls();
 	print('MINITAUR MANIA', 80, 60);
 	print('press [A] to start', 71, 80);
 }
 
-function TIC() {
-	if (gameState.title) {
-		drawTitleScreen();
-		return;
-	}
-
-=======
 const isFirstRun = true;
 
 function TIC() {
 	init();
->>>>>>> fc1184d6a2b8bc9ee3770694f909fdf00288d37d
+	if (gameState.title) {
+		drawTitleScreen();
+		return;
+	}
 	cls();
 	//drawTestmap();
 	//most params are default, just manually entered them cuz not sure what they all did tbh
@@ -293,6 +285,9 @@ function updateSacs() {
 		sacs[i].stop();
 		sacs[i].move();
 		spr(sacs[i].spr, sacs[i].x, sacs[i].y, 0);
+	}
+}
+
 function drawPlayer() {
 	spr(player.spr, player.x, player.y, 0);
 }
