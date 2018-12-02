@@ -28,7 +28,7 @@ function sacrifice() {
 	this.y = 0;
 	this.dx = 0;
 	this.dy = 0;
-	this.spr = 263;
+	this.spr = 257;
 	this.health = 100;
 	this.speed = 1;
 
@@ -52,7 +52,6 @@ function sacrifice() {
 		} else {
 			this.x = spawnLocation[index].x;
 			this.y = spawnLocation[index].y;
-			spr(this.spr, this.x, this.y, 0);
 			spawnLocation[index].used = true;
 		}
 	};
@@ -75,60 +74,61 @@ function sacrifice() {
 	}
 
 	this.move = function() {
-		if (waveTimer.remaining % 16 === 0) {
-			//pick a direction to move
-			var directionChosen = false;
-			var direction = 0;
-			var counter = 0;
-
-			//check if can move in that direction, if not possible, go back to step 1
-			while (directionChosen === false) {
-				if (counter > 8) {
-					return;
-				}
-
-				direction = Math.floor(Math.random() * 4);
-
-				var boundCanMove = canMove.bind(this);
-
-				if (boundCanMove(getDirectionMapping(direction))) {
-					directionChosen = true;
-				}
-
-				counter++;
-			}
-
-			//move in said direction
-			var realDirection = getDirectionMapping(direction);
-
-			switch (realDirection) {
-				case 'u': {
-					this.dy -= this.speed;
-					break;
-				}
-				case 'd': {
-					this.dy += this.speed;
-					break;
-				}
-				case 'l': {
-					this.dx -= this.speed;
-					break;
-				}
-				case 'r': {
-					this.dx += this.speed;
-					break;
+		if (!this.halted) {
+			if (this.canMoveDir('u')) {
+				if (btn(0)) {
+					this.dy -= 0.5;
+					this.facing = 'u';
 				}
 			}
+			if (this.canMoveDir('d')) {
+				if (btn(1)) {
+					this.dy += 0.5;
+					this.facing = 'd';
+				}
+			}
+			if (this.canMoveDir('l')) {
+				if (btn(2)) {
+					this.dx -= 0.5;
+					this.facing = 'l';
+				}
+			}
+			if (this.canMoveDir('r')) {
+				if (btn(3)) {
+					this.dx += 0.5;
+					this.facing = 'r';
+				}
+			}
+
+			this.x += this.dx;
+			this.y += this.dy;
 		}
 	};
 
 	this.stop = function() {
-		//reset
 		this.dx = 0;
 		this.dy = 0;
 	};
 
-	this.spawn();
+	(this.canMoveDir = function(direction) {
+		if (direction == 'l') {
+			if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 3) == 0)
+				return true;
+		}
+		if (direction == 'r') {
+			if (pix(this.x + 4, this.y) == 0 && pix(this.x + 4, this.y + 3) == 0)
+				return true;
+		}
+		if (direction == 'u') {
+			if (pix(this.x, this.y - 1) == 0 && pix(this.x + 3, this.y - 1) == 0)
+				return true;
+		}
+		if (direction == 'd') {
+			if (pix(this.x, this.y + 4) == 0 && pix(this.x + 3, this.y + 4) == 0)
+				return true;
+		}
+	}),
+		this.spawn();
 }
 
 function populateSacrifices() {
@@ -298,21 +298,21 @@ const axe = {
 function drawTitleScreen() {
 	cls(0);
 
-	if (btnp(4)) {
+	if (btn(4)) {
 		gameState.story = true;
 		gameState.gameStart = false;
 		player.reset();
 	}
-	if (btnp(5)) {
+	if (btn(5)) {
 		gameState.story = false;
 		gameState.gameStart = true;
 	}
 
 	map(210, 120, 60, 60, 60, 10, 7, 2, null);
 
-	var button1 = 'A';
+	var button1 = 'Z';
 	if (!gameState.story) {
-		button1 = 'A';
+		button1 = 'Z';
 	} else if (gameState.gameStartTimer > 90) {
 		button1 = '3';
 		gameState.gameStartTimer--;
@@ -326,9 +326,9 @@ function drawTitleScreen() {
 		gameState.title = false;
 	}
 
-	var button2 = 'B';
+	var button2 = 'X';
 	if (!gameState.gameStart) {
-		button2 = 'B';
+		button2 = 'X';
 	} else if (gameState.gameStartTimer > 90) {
 		button2 = '3';
 		gameState.gameStartTimer--;
@@ -349,12 +349,12 @@ function drawTitleScreen() {
 function drawGameOverScreen() {
 	cls();
 
-	if (btnp(4)) {
+	if (btn(4)) {
 		gameState.gameStart = true;
 		player.reset();
 	}
 
-	if (btnp(5)) {
+	if (btn(5)) {
 		gameState.gameOver = false;
 		gameState.title = true;
 		player.reset();
@@ -379,7 +379,7 @@ function drawGameOverScreen() {
 
 	print('YOU FAILED TO CLAIM THE THRONE', 42, 45);
 	print('press [' + button + '] to try again', 68, 65);
-	print('press [B] to give up', 75, 85);
+	print('press [X] to give up', 75, 85);
 }
 
 function drawStory() {
@@ -398,11 +398,11 @@ function drawStory() {
 		print('the chance to reclaim your humanity', 27, 20);
 		print('by consuming the sacrifices and heroes', 18, 30);
 		print('tossed before you.', 68, 40);
-		print('Even more, as your power grows you', 30, 60);
+		print('Even more, as your power grows, you', 28, 60);
 		print('may one day come to rule over those', 27, 70);
 		print('who made you an outcast...', 56, 80);
 
-		if (btnp(4)) {
+		if (btn(4)) {
 			gameState.gameStart = true;
 			player.reset();
 		}
@@ -475,10 +475,10 @@ function updateSacs() {
 
 	for (var i = 0, len = sacrifices.length; i < len; i++) {
 		person = sacrifices[i];
-
+		person.stop();
 		person.move();
 
-		spr(person.spr, person.x + person.dx, person.y + person.dy, 0);
+		spr(person.spr, person.x, person.y, 0);
 	}
 }
 
@@ -496,13 +496,10 @@ function updateTimer() {
 }
 
 function drawUI() {
-	print('TIME:', 164, 0, 1);
+	print('WAVE:', 164, 0, 1);
 	for (i = 0; i < waveTimer.remaining / 75; i++) {
 		rect(192 + i, 0, 1, 5, 1);
 	}
-
-	print('SACRIFICES: ' + sacrifices.length, 60, 0, 1);
-	print('LVL: ' + gameState.difficulty, 0, 0, 1);
 }
 
 // <TILES>
@@ -574,7 +571,7 @@ function drawUI() {
 // </SPRITES>
 
 // <MAP>
-// 000:400404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+// 000: 404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 // 001:9010101010101010101010101010101010101010101010101010101010b09010101010101010109010901010101010101010101010101010101010b09010101010101010101010101010101010101010101010101010101010b09010101010101010101010101010101010101010101010101010101010b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 // 002:704040404040404040404040404040404040404040404040404040404050704040404040404040704070404040114040404040404040404040404050704040404040404040404040404040404040404040404040404040404050704040404040404040404040404040404040404040404040404040404050000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 // 003:70329010101010101010101010b0a6a64090101010101010101010b0405090101010101010b0407040101010101010b0405040101010101010b0405070409010101010101010101010b0404090101010101010101010101040507040904040b0404040404040404040404040404040404040904040b04050000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
