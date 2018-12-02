@@ -4,7 +4,9 @@
 // script: js
 
 const gameState = {
-	title: false,
+	title: true,
+	gameStart: false,
+	gameStartTimer: 180,
 	play: true,
 	difficulty: 0.1,
 	waveCleared: false,
@@ -210,8 +212,30 @@ const axe = {
 
 function drawTitleScreen() {
 	cls();
+
+	if (btn(4)) {
+		gameState.gameStart = true;
+	}
+
+	var button = 'A';
+	if (!gameState.gameStart) {
+		button = 'A';
+		gameState.gameStartTimer = 240;
+	} else if (gameState.gameStartTimer > 180) {
+		button = '3';
+		gameState.gameStartTimer--;
+	} else if (gameState.gameStartTimer > 120) {
+		button = '2';
+		gameState.gameStartTimer--;
+	} else if (gameState.gameStartTimer > 60) {
+		button = '1';
+		gameState.gameStartTimer--;
+	} else {
+		gameState.title = false;
+	}
+
 	print('MINITAUR MANIA', 80, 60);
-	print('press [A] to start', 71, 80);
+	print('press [' + button + '] to start', 71, 80);
 }
 
 const isFirstRun = true;
