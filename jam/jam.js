@@ -8,7 +8,7 @@ const gameState = {
 	gameStart: false,
 	gameStartTimer: 180,
 	play: true,
-	difficulty: 0.1,
+	difficulty: 5,
 	waveCleared: false,
 	gameOver: false
 };
@@ -234,16 +234,49 @@ function drawTitleScreen() {
 		gameState.title = false;
 	}
 
-	print('MINITAUR MANIA', 80, 60);
-	print('press [' + button + '] to start', 71, 80);
+	print('MINITAUR MANIA', 86, 60);
+	print('press [' + button + '] to start', 76, 80);
+}
+
+function drawGameOverScreen() {
+	cls();
+
+	if (btn(4)) {
+		gameState.gameStart = true;
+	}
+
+	var button = 'A';
+	if (!gameState.gameStart) {
+		button = 'A';
+		gameState.gameStartTimer = 120;
+	} else if (gameState.gameStartTimer > 90) {
+		button = '3';
+		gameState.gameStartTimer--;
+	} else if (gameState.gameStartTimer > 60) {
+		button = '2';
+		gameState.gameStartTimer--;
+	} else if (gameState.gameStartTimer > 30) {
+		button = '1';
+		gameState.gameStartTimer--;
+	} else {
+		gameState.gameOver = false;
+	}
+
+	print('YOU FAILED TO CLAIM THE THRONE', 42, 60);
+	print('press [' + button + '] to try again', 71, 80);
 }
 
 const isFirstRun = true;
 
 function TIC() {
 	init();
+
 	if (gameState.title) {
 		drawTitleScreen();
+		return;
+	}
+	if (gameState.gameOver) {
+		drawGameOverScreen();
 		return;
 	}
 	cls();
@@ -251,7 +284,7 @@ function TIC() {
 	//most params are default, just manually entered them cuz not sure what they all did tbh
 	map(0, 0, 30, 17, 0, 0, -1, 1, null);
 	updateSacs();
-	waveTimer.tick(1);
+	updateTimer();
 	drawUI();
 	updatePlayer();
 	drawPlayer();
@@ -280,6 +313,15 @@ function updateSacs() {
 
 function drawPlayer() {
 	spr(player.spr, player.x, player.y, 0);
+}
+
+function updateTimer() {
+	waveTimer.tick(gameState.difficulty);
+	if (waveTimer.remaining <= 0) {
+		gameState.gameOver = true;
+		gameState.gameStart = false;
+		waveTimer.remaining = 3600;
+	}
 }
 
 function drawUI() {
