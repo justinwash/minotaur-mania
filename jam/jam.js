@@ -4,7 +4,7 @@
 // script: js
 
 const gameState = {
-	title: true,
+	title: false,
 	gameStart: false,
 	gameStartTimer: 180,
 	play: true,
@@ -12,81 +12,79 @@ const gameState = {
 	waveCleared: false,
 	gameOver: false
 };
-const sacs = [];
-
-const sac = {
-	x: 0,
-	y: 0,
-	dx: 0,
-	dy: 0,
-	spr: 263,
-	health: 100,
-	speed: 1,
-	stop: function() {
-		this.dx = 0;
-		this.dy = 0;
-	},
-	move: function() {
-		/*
-		if (!this.halted) {
-			if (this.canMoveDir("u")) {
-				if (btn(0)) {
-					this.dy -= 0.5;
-					this.facing = "u";
-				}
-			}
-			if (this.canMoveDir("d")) {
-				if (btn(1)) {
-					this.dy += 0.5;
-					this.facing = "d";
-				}
-			}
-			if (this.canMoveDir("l")) {
-				if (btn(2)) {
-					this.dx -= 0.5;
-					this.facing = "l";
-				}
-			}
-			if (this.canMoveDir("r")) {
-				if (btn(3)) {
-					this.dx += 0.5;
-					this.facing = "r";
-				}
-			}
-
-			this.x += this.dx;
-			this.y += this.dy;
-		}
-		*/
-	}
-};
 
 const spawnLocation = [
 	{ x: 100, y: 100, used: false },
-	{ x: 200, y: 200, used: false }
+	{ x: 50, y: 50, used: false },
+	{ x: 75, y: 75, used: false }
 ];
 
-function allocateSpawnsforSacs() {
-	var random = Math.floor(Math.random() * spawnLocation.length);
-	trace(random);
-	while (spawnLocation[random].used === true) {
-		random = Math.floor(Math.random() * spawnLocation.length);
-		spawnLocation[random].used = true;
+const sacrifices = [];
+
+function sacrifice() {
+	this.x = 0,
+		this.y = 0,
+		this.dx = 0,
+		this.dy = 0,
+		this.spr = 263,
+		this.health = 100,
+		this.speed = 1;
+
+	this.spawn = function () {
+		var index = Math.floor(Math.random() * spawnLocation.length);
+		var notAllUsed = false;
+
+		if (spawnLocation[index].used === true) {
+			//already been used
+			//check if any remain unused. If so, recurse. Else, don't spawn.
+
+			for (var i = 0, len = spawnLocation.length; i < len; i++) {
+				if (spawnLocation[i].used === false) {
+					notAllUsed = true;
+				}
+			}
+
+			if (notAllUsed) {
+				this.spawn(); //if some locations are not used, then try to spawn again
+			}
+
+		} else {
+			this.x = spawnLocation[index].x;
+			this.y = spawnLocation[index].y;
+
+		    trace("Creating sacrifice on: " + this.x + ", " + this.y);
+
+			spr(this.spr, this.x, this.y, 0);
+			spawnLocation[index].used = true;
+		}
+
 	}
-	return spawnLocation[random];
+
+	this.move = function () {
+
+	}
+
+	this.stop = function () {
+		//reset
+		this.dx = 0;
+		this.dy = 0;
+	}   
+
+	this.spawn();
 }
 
-function populateSacs() {
+function populateSacrifices() {
+	var person = void 0;
+
 	for (var i = 0; i < 2; i++) {
-		sac.x = allocateSpawnsforSacs().x;
-		sac.y = allocateSpawnsforSacs().y;
-		sacs[i] = sac;
+		person = new sacrifice();
+		sacrifices.push(person);
 	}
 }
 
 const waveTimer = {
 	remaining: 3600, //60sec at 60fps
-	tick: function(rate) {
+	tick: function (rate) {
 		this.remaining = this.remaining - rate;
 	}
 };
@@ -103,7 +101,7 @@ const player = {
 	attacking: false,
 	speed: 1,
 	halted: false,
-	move: function() {
+	move: function () {
 		if (!this.halted) {
 			if (this.canMoveDir('u')) {
 				if (btn(0)) {
@@ -134,7 +132,7 @@ const player = {
 			this.y += this.dy;
 		}
 	},
-	stop: function() {
+	stop: function () {
 		this.dx = 0;
 		this.dy = 0;
 	},
@@ -204,7 +202,7 @@ const axe = {
 	spr: [272],
 	rotation: [0, 0],
 	flip: 0,
-	hitEnemy: function() {
+	hitEnemy: function () {
 		//do stuff
 	},
 	cooldown: 0
@@ -292,7 +290,7 @@ function TIC() {
 
 function init() {
 	if (isFirstRun) {
-		populateSacs();
+		populateSacrifices();
 		isFirstRun = false;
 	}
 }
@@ -304,10 +302,12 @@ function updatePlayer() {
 }
 
 function updateSacs() {
-	for (var i = 0; i < sacs.length; i++) {
-		sacs[i].stop();
-		sacs[i].move();
-		spr(sacs[i].spr, sacs[i].x, sacs[i].y, 0);
+	var person = void 0;
+
+	for (var i = 0, len = sacrifices.length; i < len; i++) {
+		person = sacrifices[i];
+
+		spr(person.spr, person.x, person.y, 0);
 	}
 }
 
