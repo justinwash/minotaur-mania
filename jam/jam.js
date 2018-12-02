@@ -259,7 +259,7 @@ function drawGameOverScreen() {
 		button = '1';
 		gameState.gameStartTimer--;
 	} else {
-		gameState.gameOver = false;
+		gameState.gameOver = false; //c
 	}
 
 	print('YOU FAILED TO CLAIM THE THRONE', 42, 60);
