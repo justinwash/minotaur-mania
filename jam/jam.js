@@ -3,6 +3,12 @@
 // desc:   sacrifices must be made
 // script: js
 
+const sprId = {
+	PLAYER = 256,
+	AXE = 272,
+	SACRIFICE = 257,
+}
+
 const gameState = {
 	title: true,
 	story: false,
@@ -25,12 +31,12 @@ const sacrifices = [];
 
 function sacrifice() {
 	(this.x = 0),
-		(this.y = 0),
-		(this.dx = 0),
-		(this.dy = 0),
-		(this.spr = 263),
-		(this.health = 100),
-		(this.speed = 1);
+	(this.y = 0),
+	(this.dx = 0),
+	(this.dy = 0),
+	(this.spr = sprid.SACRIFICE),
+	(this.health = 100),
+	(this.speed = 1);
 
 	this.spawn = function() {
 		var index = Math.floor(Math.random() * spawnLocation.length);
@@ -176,7 +182,7 @@ const player = {
 	dx: 0,
 	dy: 0,
 	facing: 'r',
-	spr: 256,
+	spr: sprId.PLAYER,
 	health: 100,
 	attacking: false,
 	speed: 1,
@@ -288,7 +294,7 @@ const player = {
 const axe = {
 	x: 0,
 	y: 0,
-	spr: [272],
+	spr: [sprId.AXE],
 	rotation: [0, 0],
 	flip: 0,
 	hitEnemy: function() {
