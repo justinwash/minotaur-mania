@@ -4,13 +4,15 @@
 // script: js
 
 const gameState = {
-	title: false,
+	title: true,
+	gameStart: false,
+	gameStartTimer: 180,
 	play: true,
 	difficulty: 0.1,
 	waveCleared: false,
 	gameOver: false
 };
-const sacs = []
+const sacs = [];
 
 const sac = {
 	x: 0,
@@ -20,11 +22,11 @@ const sac = {
 	spr: 263,
 	health: 100,
 	speed: 1,
-	stop: function () {
+	stop: function() {
 		this.dx = 0;
 		this.dy = 0;
 	},
-	move: function () {
+	move: function() {
 		/*
 		if (!this.halted) {
 			if (this.canMoveDir("u")) {
@@ -56,10 +58,13 @@ const sac = {
 			this.y += this.dy;
 		}
 		*/
-	},
-}
+	}
+};
 
-const spawnLocation = [{ x: 100, y: 100, used: false }, { x: 200, y: 200, used: false }]
+const spawnLocation = [
+	{ x: 100, y: 100, used: false },
+	{ x: 200, y: 200, used: false }
+];
 
 function allocateSpawnsforSacs() {
 	var random = Math.floor(Math.random() * spawnLocation.length);
@@ -81,7 +86,7 @@ function populateSacs() {
 
 const waveTimer = {
 	remaining: 3600, //60sec at 60fps
-	tick: function (rate) {
+	tick: function(rate) {
 		this.remaining = this.remaining - rate;
 	}
 };
@@ -98,7 +103,7 @@ const player = {
 	attacking: false,
 	speed: 1,
 	halted: false,
-	move: function () {
+	move: function() {
 		if (!this.halted) {
 			if (this.canMoveDir('u')) {
 				if (btn(0)) {
@@ -129,7 +134,7 @@ const player = {
 			this.y += this.dy;
 		}
 	},
-	stop: function () {
+	stop: function() {
 		this.dx = 0;
 		this.dy = 0;
 	},
@@ -199,7 +204,7 @@ const axe = {
 	spr: [272],
 	rotation: [0, 0],
 	flip: 0,
-	hitEnemy: function () {
+	hitEnemy: function() {
 		//do stuff
 	},
 	cooldown: 0
@@ -207,8 +212,30 @@ const axe = {
 
 function drawTitleScreen() {
 	cls();
+
+	if (btn(4)) {
+		gameState.gameStart = true;
+	}
+
+	var button = 'A';
+	if (!gameState.gameStart) {
+		button = 'A';
+		gameState.gameStartTimer = 240;
+	} else if (gameState.gameStartTimer > 180) {
+		button = '3';
+		gameState.gameStartTimer--;
+	} else if (gameState.gameStartTimer > 120) {
+		button = '2';
+		gameState.gameStartTimer--;
+	} else if (gameState.gameStartTimer > 60) {
+		button = '1';
+		gameState.gameStartTimer--;
+	} else {
+		gameState.title = false;
+	}
+
 	print('MINITAUR MANIA', 80, 60);
-	print('press [A] to start', 71, 80);
+	print('press [' + button + '] to start', 71, 80);
 }
 
 const isFirstRun = true;
