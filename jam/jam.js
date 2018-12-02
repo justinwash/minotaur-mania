@@ -109,42 +109,49 @@ function populateSacs() {
 	}
 }
 
+const waveTimer = {
+	remaining: 3600, //60sec at 60fps
+	tick: function(rate) {
+		this.remaining = this.remaining - rate;
+	}
+};
+
 const player = {
 	x: 24,
-	y: 8,
+	y: 16,
 	dx: 0,
 	dy: 0,
-	facing: "r",
+	facing: 'r',
 	spr: 256,
 	lives: 3,
 	health: 100,
 	attacking: false,
 	speed: 1,
 	halted: false,
-	move: function () {
+	move: function() {
 		if (!this.halted) {
-			if (this.canMoveDir("u")) {
+			if (this.canMoveDir('u')) {
 				if (btn(0)) {
 					this.dy -= 0.5;
-					this.facing = "u";
+					this.facing = 'u';
 				}
 			}
-			if (this.canMoveDir("d")) {
+			if (this.canMoveDir('d')) {
 				if (btn(1)) {
 					this.dy += 0.5;
-					this.facing = "d";
+					this.facing = 'd';
 				}
 			}
-			if (this.canMoveDir("l")) {
+			if (this.canMoveDir('l')) {
 				if (btn(2)) {
 					this.dx -= 0.5;
-					this.facing = "l";
+					this.facing = 'l';
 				}
 			}
-			if (this.canMoveDir("r")) {
+			if (this.canMoveDir('r')) {
 				if (btn(3)) {
 					this.dx += 0.5;
-					this.facing = "r";
+					this.facing = 'r';
 				}
 			}
 
@@ -152,63 +159,66 @@ const player = {
 			this.y += this.dy;
 		}
 	},
-	stop: function () {
+	stop: function() {
 		this.dx = 0;
 		this.dy = 0;
 	},
 	canMoveDir(direction) {
-		if (direction == "l") {
+		if (direction == 'l') {
 			if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 5) == 0)
 				return true;
 		}
-		if (direction == "r") {
+		if (direction == 'r') {
 			if (pix(this.x + 6, this.y) == 0 && pix(this.x + 6, this.y + 5) == 0)
 				return true;
 		}
-		if (direction == "u") {
+		if (direction == 'u') {
 			if (pix(this.x, this.y - 1) == 0 && pix(this.x + 5, this.y - 1) == 0)
 				return true;
 		}
-		if (direction == "d") {
+		if (direction == 'd') {
 			if (pix(this.x, this.y + 6) == 0 && pix(this.x + 5, this.y + 6) == 0)
 				return true;
 		}
 	},
 	attack() {
-		if (player.facing == "r") {
-			axe.x = player.x + 6;
-			axe.y = player.y - 2;
+		if (player.facing == 'r') {
+			axe.x = player.x + 4;
+			axe.y = player.y - 1;
 			axe.flip = 0;
+			axe.rotation = [0, 1];
 		}
 
-		if (player.facing == "l") {
-			axe.x = player.x - 8;
-			axe.y = player.y - 2;
+		if (player.facing == 'l') {
+			axe.x = player.x - 6;
+			axe.y = player.y - 1;
 			axe.flip = 1;
+			axe.rotation = [0, 1];
 		}
 
-		if (player.facing == "u") {
-			axe.x = player.x + 2;
-			axe.y = player.y - 5;
+		if (player.facing == 'u') {
+			axe.x = player.x - 1;
+			axe.y = player.y - 6;
 			axe.flip = 3;
+			axe.rotation = [1, 2];
 		}
 
-		if (player.facing == "d") {
-			axe.x = player.x + 2;
-			axe.y = player.y + 6;
+		if (player.facing == 'd') {
+			axe.x = player.x - 1;
+			axe.y = player.y + 4;
 			axe.flip = 4;
+			axe.rotation = [1, 2];
 		}
 
 		if (btn(4) && axe.cooldown <= 0) {
 			axe.cooldown = 30;
-			spr(axe.spr[0], axe.x, axe.y, 0, 1, axe.flip);
+			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[0]);
 		} else if (axe.cooldown > 15) {
 			axe.cooldown--;
-			spr(axe.spr[0], axe.x, axe.y, 0, 1, axe.flip);
+			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[0]);
 		} else if (axe.cooldown > 0) {
 			axe.cooldown--;
-			axe.rotation = 0;
-			spr(axe.spr[1], axe.x, axe.y, 0, 1, axe.flip, axe.rotation);
+			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[1]);
 		}
 	}
 };
@@ -216,10 +226,10 @@ const player = {
 const axe = {
 	x: 0,
 	y: 0,
-	spr: [272, 273],
-	rotation: 0,
+	spr: [272],
+	rotation: [0, 0],
 	flip: 0,
-	hitEnemy: function () {
+	hitEnemy: function() {
 		//do stuff
 	},
 	cooldown: 0
@@ -234,8 +244,10 @@ function TIC() {
 	//most params are default, just manually entered them cuz not sure what they all did tbh
 	map(0, 0, 30, 17, 0, 0, -1, 1, null);
 	updateSacs();
+	waveTimer.tick(1);
+	drawUI();
 	updatePlayer();
-	spr(player.spr, player.x, player.y, 0);
+	drawPlayer();
 }
 
 function init() {
@@ -256,6 +268,14 @@ function updateSacs() {
 		sacs[i].stop();
 		sacs[i].move();
 		spr(sacs[i].spr, sacs[i].x, sacs[i].y, 0);
+function drawPlayer() {
+	spr(player.spr, player.x, player.y, 0);
+}
+
+function drawUI() {
+	print('WAVE:', 164, 0, 1);
+	for (i = 0; i < waveTimer.remaining / 75; i++) {
+		rect(192 + i, 0, 1, 5, 1);
 	}
 }
 
@@ -280,12 +300,12 @@ function updateSacs() {
 // 005:0cc00440a9eaa9ea0e900e900aa00aa00cc00440a6faa6fa0f600f600aa00aa0
 // 006:0cc00440af2aaf2a02f002f00aa00aa00cc00440ab5aab5a05b005b00aa00aa0
 // 007:000000000000000000000000000ee000000ee000000000000000000000000000
-// 016:4110000041100000401000004000000040000000400000000000000000000000
-// 017:0000000000000000000000000000000044444400000011000001110000000000
+// 016:0000000000411100004111000040110000400000004000000040000000000000
 // 096:4444000044440000444400004444000000000000000000000000000000000000
 // </SPRITES>
 
 // <MAP>
+// 000:010101010101010101010101010101010101010101010101010101010101000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 // 001:501010101010101010101010101010101010101010101010101010101060000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 // 002:409090909090909090909090909090909090909090909090909090909020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 // 003:409090303030303030303030909090303030303030303090909090909020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
@@ -317,4 +337,3 @@ function updateSacs() {
 // <PALETTE>
 // 000:140c1cb2bab230346d847e6f854c30346524d04648757161597dced27d2c8595a16daa2cd2aa996dc2cadad45edeeed6
 // </PALETTE>
-
