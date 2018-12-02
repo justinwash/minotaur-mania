@@ -5,8 +5,10 @@
 
 const gameState = {
 	title: true,
+	story: false,
+	storyTimer: 1200,
 	gameStart: false,
-	gameStartTimer: 180,
+	gameStartTimer: 120,
 	play: true,
 	difficulty: 15,
 	waveCleared: false,
@@ -295,31 +297,51 @@ function drawTitleScreen() {
 	cls(0);
 
 	if (btn(4)) {
-		gameState.gameStart = true;
+		gameState.story = true;
+		gameState.gameStart = false;
 		player.reset();
+	}
+	if (btn(5)) {
+		gameState.story = false;
+		gameState.gameStart = true;
 	}
 
 	map(210, 120, 60, 60, 60, 10, 7, 2, null);
 
-	var button = 'A';
-	if (!gameState.gameStart) {
-		button = 'A';
-		gameState.gameStartTimer = 120;
+	var button1 = 'Z';
+	if (!gameState.story) {
+		button1 = 'Z';
 	} else if (gameState.gameStartTimer > 90) {
-		button = '3';
+		button1 = '3';
 		gameState.gameStartTimer--;
 	} else if (gameState.gameStartTimer > 60) {
-		button = '2';
+		button1 = '2';
 		gameState.gameStartTimer--;
 	} else if (gameState.gameStartTimer > 30) {
-		button = '1';
+		button1 = '1';
 		gameState.gameStartTimer--;
 	} else {
 		gameState.title = false;
 	}
 
-	print('press [' + button + '] to start', 76, 114);
-	print('press [X] to skip intro', 66, 124);
+	var button2 = 'X';
+	if (!gameState.gameStart) {
+		button2 = 'X';
+	} else if (gameState.gameStartTimer > 90) {
+		button2 = '3';
+		gameState.gameStartTimer--;
+	} else if (gameState.gameStartTimer > 60) {
+		button2 = '2';
+		gameState.gameStartTimer--;
+	} else if (gameState.gameStartTimer > 30) {
+		button2 = '1';
+		gameState.gameStartTimer--;
+	} else {
+		gameState.title = false;
+	}
+
+	print('press [' + button1 + '] to start', 76, 114);
+	print('press [' + button2 + '] to skip intro', 66, 124);
 }
 
 function drawGameOverScreen() {
@@ -358,6 +380,53 @@ function drawGameOverScreen() {
 	print('press [X] to give up', 75, 85);
 }
 
+function drawStory() {
+	cls();
+
+	if (gameState.storyTimer > 600) {
+		print('Bastard of man and bull, you have been', 16, 10);
+		print('exiled to a remote labyrinth in Crete.', 20, 20);
+		print('A freak, a menace, an outcast.', 40, 40);
+		print('But while your appearance may seem bestial,', 4, 60);
+		print('your heart...', 86, 70);
+		print('is human...', 176, 120);
+		gameState.storyTimer--;
+	} else {
+		print('But the Gods have shown mercy, giving you', 12, 10);
+		print('the chance to reclaim your humanity', 27, 20);
+		print('by consuming the sacrifices and heroes', 18, 30);
+		print('tossed before you.', 68, 40);
+		print('Even more, as your power grows, you', 28, 60);
+		print('may one day come to rule over those', 27, 70);
+		print('who made you an outcast...', 56, 80);
+
+		if (btn(4)) {
+			gameState.gameStart = true;
+			player.reset();
+		}
+
+		var button = 'A';
+		if (!gameState.gameStart) {
+			button = 'A';
+			gameState.gameStartTimer = 120;
+		} else if (gameState.gameStartTimer > 90) {
+			button = '3';
+			gameState.gameStartTimer--;
+		} else if (gameState.gameStartTimer > 60) {
+			button = '2';
+			gameState.gameStartTimer--;
+		} else if (gameState.gameStartTimer > 30) {
+			button = '1';
+			gameState.gameStartTimer--;
+		} else {
+			gameState.story = false;
+			gameState.storyTimer = 1200;
+		}
+
+		print('press [' + button + '] to start', 76, 114);
+	}
+}
+
 const isFirstRun = true;
 
 function TIC() {
@@ -365,6 +434,10 @@ function TIC() {
 
 	if (gameState.title) {
 		drawTitleScreen();
+		return;
+	}
+	if (gameState.story) {
+		drawStory();
 		return;
 	}
 	if (gameState.gameOver) {
