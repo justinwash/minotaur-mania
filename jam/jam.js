@@ -22,15 +22,15 @@ const spawnLocation = [
 const sacrifices = [];
 
 function sacrifice() {
-	(this.x = 0),
-		(this.y = 0),
-		(this.dx = 0),
-		(this.dy = 0),
-		(this.spr = 263),
-		(this.health = 100),
-		(this.speed = 1);
+	this.x = 0,
+		this.y = 0,
+		this.dx = 0,
+		this.dy = 0,
+		this.spr = 263,
+		this.health = 100,
+		this.speed = 1;
 
-	this.spawn = function() {
+	this.spawn = function () {
 		var index = Math.floor(Math.random() * spawnLocation.length);
 		var notAllUsed = false;
 
@@ -54,8 +54,6 @@ function sacrifice() {
 			spawnLocation[index].used = true;
 		}
 	};
-
-	}
 
 
 	function getDirectionMapping(direction) {
@@ -101,7 +99,7 @@ function sacrifice() {
 		//move in said direction
 		var realDirection = getDirectionMapping(direction);
 
-		switch(realDirection) {
+		switch (realDirection) {
 			case 'u': {
 				this.dy -= this.speed;
 				break;
@@ -119,8 +117,9 @@ function sacrifice() {
 				break;
 			}
 		}
+	}
 
-	this.stop = function() {
+	this.stop = function () {
 		//reset
 		this.dx = 0;
 		this.dy = 0;
@@ -140,7 +139,7 @@ function populateSacrifices() {
 
 const waveTimer = {
 	remaining: 3600, //60sec at 60fps
-	tick: function(rate) {
+	tick: function (rate) {
 		this.remaining = this.remaining - rate;
 	}
 };
@@ -178,7 +177,7 @@ const player = {
 	attacking: false,
 	speed: 1,
 	halted: false,
-	reset: function() {
+	reset: function () {
 		this.x = 8;
 		this.y = 16;
 		this.dx = 0;
@@ -187,7 +186,7 @@ const player = {
 		this.attacking = false;
 		this.halted = false;
 	},
-	move: function() {
+	move: function () {
 		if (!this.halted) {
 			if (this.canMoveDir('u')) {
 				if (btn(0)) {
@@ -218,7 +217,7 @@ const player = {
 			this.y += this.dy;
 		}
 	},
-	stop: function() {
+	stop: function () {
 		this.dx = 0;
 		this.dy = 0;
 	},
@@ -288,7 +287,7 @@ const axe = {
 	spr: [272],
 	rotation: [0, 0],
 	flip: 0,
-	hitEnemy: function() {
+	hitEnemy: function () {
 		//do stuff
 	},
 	cooldown: 0
