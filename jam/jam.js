@@ -3,43 +3,6 @@
 // desc:   sacrifices must be made
 // script: js
 
-const testMap = [
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-];
-
-var wallSpr = 352;
-
-function drawTestmap() {
-	for (i = 0; i < testMap.length; i++) {
-		for (x = 0; x < testMap[i].length; x++) {
-			if (testMap[i][x] == 1) spr(wallSpr, x * 4, i * 4);
-		}
-	}
-}
-
 const gameState = {
 	title: false,
 	play: true,
@@ -47,7 +10,7 @@ const gameState = {
 	waveCleared: false,
 	gameOver: false
 };
-const sacs = []
+const sacs = [];
 
 const sac = {
 	x: 0,
@@ -57,11 +20,11 @@ const sac = {
 	spr: 263,
 	health: 100,
 	speed: 1,
-	stop: function () {
+	stop: function() {
 		this.dx = 0;
 		this.dy = 0;
 	},
-	move: function () {
+	move: function() {
 		/*
 		if (!this.halted) {
 			if (this.canMoveDir("u")) {
@@ -93,10 +56,13 @@ const sac = {
 			this.y += this.dy;
 		}
 		*/
-	},
-}
+	}
+};
 
-const spawnLocation = [{ x: 100, y: 100, used: false }, { x: 200, y: 200, used: false }]
+const spawnLocation = [
+	{ x: 100, y: 100, used: false },
+	{ x: 200, y: 200, used: false }
+];
 
 function allocateSpawnsforSacs() {
 	var random = Math.floor(Math.random() * spawnLocation.length);
@@ -118,7 +84,7 @@ function populateSacs() {
 
 const waveTimer = {
 	remaining: 3600, //60sec at 60fps
-	tick: function (rate) {
+	tick: function(rate) {
 		this.remaining = this.remaining - rate;
 	}
 };
@@ -135,7 +101,7 @@ const player = {
 	attacking: false,
 	speed: 1,
 	halted: false,
-	move: function () {
+	move: function() {
 		if (!this.halted) {
 			if (this.canMoveDir('u')) {
 				if (btn(0)) {
@@ -166,7 +132,7 @@ const player = {
 			this.y += this.dy;
 		}
 	},
-	stop: function () {
+	stop: function() {
 		this.dx = 0;
 		this.dy = 0;
 	},
@@ -236,7 +202,7 @@ const axe = {
 	spr: [272],
 	rotation: [0, 0],
 	flip: 0,
-	hitEnemy: function () {
+	hitEnemy: function() {
 		//do stuff
 	},
 	cooldown: 0
