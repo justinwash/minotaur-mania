@@ -24,13 +24,13 @@ const spawnLocation = [
 const sacrifices = [];
 
 function sacrifice() {
-	(this.x = 0),
-		(this.y = 0),
-		(this.dx = 0),
-		(this.dy = 0),
-		(this.spr = 263),
-		(this.health = 100),
-		(this.speed = 1);
+	this.x = 0;
+	this.y = 0;
+	this.dx = 0;
+	this.dy = 0;
+	this.spr = 263;
+	this.health = 100;
+	this.speed = 1;
 
 	this.spawn = function() {
 		var index = Math.floor(Math.random() * spawnLocation.length);
@@ -75,53 +75,51 @@ function sacrifice() {
 	}
 
 	this.move = function() {
-		if((waveTimer.remaining % 16) === 0) {
-		
-		//pick a direction to move
-		var directionChosen = false;
-		var direction = 0;
-		var counter = 0;
+		if (waveTimer.remaining % 16 === 0) {
+			//pick a direction to move
+			var directionChosen = false;
+			var direction = 0;
+			var counter = 0;
 
-		//check if can move in that direction, if not possible, go back to step 1
-		while (directionChosen === false) {
-			if (counter > 8) {
-				return;
+			//check if can move in that direction, if not possible, go back to step 1
+			while (directionChosen === false) {
+				if (counter > 8) {
+					return;
+				}
+
+				direction = Math.floor(Math.random() * 4);
+
+				var boundCanMove = canMove.bind(this);
+
+				if (boundCanMove(getDirectionMapping(direction))) {
+					directionChosen = true;
+				}
+
+				counter++;
 			}
 
-			direction = Math.floor(Math.random() * 4);
+			//move in said direction
+			var realDirection = getDirectionMapping(direction);
 
-			var boundCanMove = canMove.bind(this);
-
-			if (boundCanMove(getDirectionMapping(direction))) {
-				directionChosen = true;
+			switch (realDirection) {
+				case 'u': {
+					this.dy -= this.speed;
+					break;
+				}
+				case 'd': {
+					this.dy += this.speed;
+					break;
+				}
+				case 'l': {
+					this.dx -= this.speed;
+					break;
+				}
+				case 'r': {
+					this.dx += this.speed;
+					break;
+				}
 			}
-
-			counter++;
 		}
-	
-
-		//move in said direction
-		var realDirection = getDirectionMapping(direction);
-
-		switch (realDirection) {
-			case 'u': {
-				this.dy -= this.speed;
-				break;
-			}
-			case 'd': {
-				this.dy += this.speed;
-				break;
-			}
-			case 'l': {
-				this.dx -= this.speed;
-				break;
-			}
-			case 'r': {
-				this.dx += this.speed;
-				break;
-			}
-		}
-	}
 	};
 
 	this.stop = function() {
@@ -498,10 +496,13 @@ function updateTimer() {
 }
 
 function drawUI() {
-	print('WAVE:', 164, 0, 1);
+	print('TIME:', 164, 0, 1);
 	for (i = 0; i < waveTimer.remaining / 75; i++) {
 		rect(192 + i, 0, 1, 5, 1);
 	}
+
+	print('SACRIFICES: ' + sacrifices.length, 60, 0, 1);
+	print('LVL: ' + gameState.difficulty, 0, 0, 1);
 }
 
 // <TILES>
@@ -616,4 +617,3 @@ function drawUI() {
 // <PALETTE>
 // 000:140c1cb2bab230346d847e6f854c30346524d04648757161597dced27d2c8595a16daa2cd2aa996dc2cadad45edeeed6
 // </PALETTE>
-
