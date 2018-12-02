@@ -220,14 +220,14 @@ function drawTitleScreen() {
 	var button = 'A';
 	if (!gameState.gameStart) {
 		button = 'A';
-		gameState.gameStartTimer = 240;
-	} else if (gameState.gameStartTimer > 180) {
+		gameState.gameStartTimer = 120;
+	} else if (gameState.gameStartTimer > 90) {
 		button = '3';
 		gameState.gameStartTimer--;
-	} else if (gameState.gameStartTimer > 120) {
+	} else if (gameState.gameStartTimer > 60) {
 		button = '2';
 		gameState.gameStartTimer--;
-	} else if (gameState.gameStartTimer > 60) {
+	} else if (gameState.gameStartTimer > 30) {
 		button = '1';
 		gameState.gameStartTimer--;
 	} else {
