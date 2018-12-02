@@ -8,7 +8,7 @@ const gameState = {
 	gameStart: false,
 	gameStartTimer: 180,
 	play: true,
-	difficulty: 5,
+	difficulty: 15,
 	waveCleared: false,
 	gameOver: false
 };
@@ -22,15 +22,15 @@ const spawnLocation = [
 const sacrifices = [];
 
 function sacrifice() {
-	this.x = 0,
-		this.y = 0,
-		this.dx = 0,
-		this.dy = 0,
-		this.spr = 263,
-		this.health = 100,
-		this.speed = 1;
+	(this.x = 0),
+		(this.y = 0),
+		(this.dx = 0),
+		(this.dy = 0),
+		(this.spr = 263),
+		(this.health = 100),
+		(this.speed = 1);
 
-	this.spawn = function () {
+	this.spawn = function() {
 		var index = Math.floor(Math.random() * spawnLocation.length);
 		var notAllUsed = false;
 
@@ -47,28 +47,24 @@ function sacrifice() {
 			if (notAllUsed) {
 				this.spawn(); //if some locations are not used, then try to spawn again
 			}
-
 		} else {
 			this.x = spawnLocation[index].x;
 			this.y = spawnLocation[index].y;
 
-		    trace("Creating sacrifice on: " + this.x + ", " + this.y);
+			trace('Creating sacrifice on: ' + this.x + ', ' + this.y);
 
 			spr(this.spr, this.x, this.y, 0);
 			spawnLocation[index].used = true;
 		}
+	};
 
-	}
+	this.move = function() {};
 
-	this.move = function () {
-
-	}
-
-	this.stop = function () {
+	this.stop = function() {
 		//reset
 		this.dx = 0;
 		this.dy = 0;
-	}   
+	};
 
 	this.spawn();
 }
@@ -84,24 +80,32 @@ function populateSacrifices() {
 
 const waveTimer = {
 	remaining: 3600, //60sec at 60fps
-	tick: function (rate) {
+	tick: function(rate) {
 		this.remaining = this.remaining - rate;
 	}
 };
 
 const player = {
-	x: 24,
+	x: 8,
 	y: 16,
 	dx: 0,
 	dy: 0,
 	facing: 'r',
 	spr: 256,
-	lives: 3,
 	health: 100,
 	attacking: false,
 	speed: 1,
 	halted: false,
-	move: function () {
+	reset: function() {
+		this.x = 8;
+		this.y = 16;
+		this.dx = 0;
+		this.dy = 0;
+		this.health = 100;
+		this.attacking = false;
+		this.halted = false;
+	},
+	move: function() {
 		if (!this.halted) {
 			if (this.canMoveDir('u')) {
 				if (btn(0)) {
@@ -132,7 +136,7 @@ const player = {
 			this.y += this.dy;
 		}
 	},
-	stop: function () {
+	stop: function() {
 		this.dx = 0;
 		this.dy = 0;
 	},
@@ -202,7 +206,7 @@ const axe = {
 	spr: [272],
 	rotation: [0, 0],
 	flip: 0,
-	hitEnemy: function () {
+	hitEnemy: function() {
 		//do stuff
 	},
 	cooldown: 0
@@ -213,6 +217,7 @@ function drawTitleScreen() {
 
 	if (btn(4)) {
 		gameState.gameStart = true;
+		player.reset();
 	}
 
 	var button = 'A';
@@ -232,8 +237,9 @@ function drawTitleScreen() {
 		gameState.title = false;
 	}
 
-	print('MINITAUR MANIA', 86, 60);
-	print('press [' + button + '] to start', 76, 80);
+	print('MINITAUR MANIA', 86, 45);
+	print('press [' + button + '] to start', 76, 65);
+	print('press [X] to skip intro', 66, 85);
 }
 
 function drawGameOverScreen() {
@@ -241,6 +247,13 @@ function drawGameOverScreen() {
 
 	if (btn(4)) {
 		gameState.gameStart = true;
+		player.reset();
+	}
+
+	if (btn(5)) {
+		gameState.gameOver = false;
+		gameState.title = true;
+		player.reset();
 	}
 
 	var button = 'A';
@@ -260,8 +273,9 @@ function drawGameOverScreen() {
 		gameState.gameOver = false;
 	}
 
-	print('YOU FAILED TO CLAIM THE THRONE', 42, 60);
-	print('press [' + button + '] to try again', 71, 80);
+	print('YOU FAILED TO CLAIM THE THRONE', 42, 45);
+	print('press [' + button + '] to try again', 68, 65);
+	print('press [X] to give up', 75, 85);
 }
 
 const isFirstRun = true;
@@ -426,4 +440,3 @@ function drawUI() {
 // <PALETTE>
 // 000:140c1cb2bab230346d847e6f854c30346524d04648757161597dced27d2c8595a16daa2cd2aa996dc2cadad45edeeed6
 // </PALETTE>
-
