@@ -40,6 +40,14 @@ function drawTestmap() {
 	}
 }
 
+const gameState = {
+	title: true,
+	play: true,
+	difficulty: 0.1,
+	waveCleared: false,
+	gameOver: false
+};
+
 const waveTimer = {
 	remaining: 3600, //60sec at 60fps
 	tick: function(rate) {
@@ -166,7 +174,18 @@ const axe = {
 	cooldown: 0
 };
 
+function drawTitleScreen() {
+	cls();
+	print('MINITAUR MANIA', 80, 60);
+	print('press [A] to start', 71, 80);
+}
+
 function TIC() {
+	if (gameState.title) {
+		drawTitleScreen();
+		return;
+	}
+
 	cls();
 	//drawTestmap();
 	//most params are default, just manually entered them cuz not sure what they all did tbh
