@@ -4,171 +4,259 @@
 // script: js
 
 const testMap = [
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
 var wallSpr = 352;
 
 function drawTestmap() {
-  for (i = 0; i < testMap.length; i++) {
-    for (x = 0; x < testMap[i].length; x++) {
-      if (testMap[i][x] == 1) spr(wallSpr, x * 4, i * 4);
-    }
-  }
+	for (i = 0; i < testMap.length; i++) {
+		for (x = 0; x < testMap[i].length; x++) {
+			if (testMap[i][x] == 1) spr(wallSpr, x * 4, i * 4);
+		}
+	}
+}
+
+const sacs = []
+
+const sac = {
+	x: 0,
+	y: 0,
+	dx: 0,
+	dy: 0,
+	spr: 263,
+	health: 100,
+	speed: 1,
+	stop: function () {
+		this.dx = 0;
+		this.dy = 0;
+	},
+	move: function () {
+		/*
+		if (!this.halted) {
+			if (this.canMoveDir("u")) {
+				if (btn(0)) {
+					this.dy -= 0.5;
+					this.facing = "u";
+				}
+			}
+			if (this.canMoveDir("d")) {
+				if (btn(1)) {
+					this.dy += 0.5;
+					this.facing = "d";
+				}
+			}
+			if (this.canMoveDir("l")) {
+				if (btn(2)) {
+					this.dx -= 0.5;
+					this.facing = "l";
+				}
+			}
+			if (this.canMoveDir("r")) {
+				if (btn(3)) {
+					this.dx += 0.5;
+					this.facing = "r";
+				}
+			}
+
+			this.x += this.dx;
+			this.y += this.dy;
+		}
+		*/
+	},
+}
+
+const spawnLocation = [{ x: 100, y: 100, used: false }, { x: 200, y: 200, used: false }]
+
+function allocateSpawnsforSacs() {
+	var random = Math.floor(Math.random() * spawnLocation.length);
+	trace(random);
+	while (spawnLocation[random].used === true) {
+		random = Math.floor(Math.random() * spawnLocation.length);
+		spawnLocation[random].used = true;
+	}
+	return spawnLocation[random];
+}
+
+function populateSacs() {
+	for (var i = 0; i < 2; i++) {
+		sac.x = allocateSpawnsforSacs().x;
+		sac.y = allocateSpawnsforSacs().y;
+		sacs[i] = sac;
+	}
 }
 
 const player = {
-  x: 24,
-  y: 8,
-  dx: 0,
-  dy: 0,
-  facing: "r",
-  spr: 256,
-  lives: 3,
-  health: 100,
-  attacking: false,
-  speed: 1,
-  halted: false,
-  move: function() {
-    if (!this.halted) {
-      if (this.canMoveDir("u")) {
-        if (btn(0)) {
-          this.dy -= 0.5;
-          this.facing = "u";
-        }
-      }
-      if (this.canMoveDir("d")) {
-        if (btn(1)) {
-          this.dy += 0.5;
-          this.facing = "d";
-        }
-      }
-      if (this.canMoveDir("l")) {
-        if (btn(2)) {
-          this.dx -= 0.5;
-          this.facing = "l";
-        }
-      }
-      if (this.canMoveDir("r")) {
-        if (btn(3)) {
-          this.dx += 0.5;
-          this.facing = "r";
-        }
-      }
+	x: 24,
+	y: 8,
+	dx: 0,
+	dy: 0,
+	facing: "r",
+	spr: 256,
+	lives: 3,
+	health: 100,
+	attacking: false,
+	speed: 1,
+	halted: false,
+	move: function () {
+		if (!this.halted) {
+			if (this.canMoveDir("u")) {
+				if (btn(0)) {
+					this.dy -= 0.5;
+					this.facing = "u";
+				}
+			}
+			if (this.canMoveDir("d")) {
+				if (btn(1)) {
+					this.dy += 0.5;
+					this.facing = "d";
+				}
+			}
+			if (this.canMoveDir("l")) {
+				if (btn(2)) {
+					this.dx -= 0.5;
+					this.facing = "l";
+				}
+			}
+			if (this.canMoveDir("r")) {
+				if (btn(3)) {
+					this.dx += 0.5;
+					this.facing = "r";
+				}
+			}
 
-      this.x += this.dx;
-      this.y += this.dy;
-    }
-  },
-  stop: function() {
-    this.dx = 0;
-    this.dy = 0;
-  },
-  canMoveDir(direction) {
-    if (direction == "l") {
-      if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 5) == 0)
-        return true;
-    }
-    if (direction == "r") {
-      if (pix(this.x + 6, this.y) == 0 && pix(this.x + 6, this.y + 5) == 0)
-        return true;
-    }
-    if (direction == "u") {
-      if (pix(this.x, this.y - 1) == 0 && pix(this.x + 5, this.y - 1) == 0)
-        return true;
-    }
-    if (direction == "d") {
-      if (pix(this.x, this.y + 6) == 0 && pix(this.x + 5, this.y + 6) == 0)
-        return true;
-    }
-  },
-  attack() {
-    if (player.facing == "r") {
-      axe.x = player.x + 6;
-      axe.y = player.y - 2;
-      axe.flip = 0;
-    }
+			this.x += this.dx;
+			this.y += this.dy;
+		}
+	},
+	stop: function () {
+		this.dx = 0;
+		this.dy = 0;
+	},
+	canMoveDir(direction) {
+		if (direction == "l") {
+			if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 5) == 0)
+				return true;
+		}
+		if (direction == "r") {
+			if (pix(this.x + 6, this.y) == 0 && pix(this.x + 6, this.y + 5) == 0)
+				return true;
+		}
+		if (direction == "u") {
+			if (pix(this.x, this.y - 1) == 0 && pix(this.x + 5, this.y - 1) == 0)
+				return true;
+		}
+		if (direction == "d") {
+			if (pix(this.x, this.y + 6) == 0 && pix(this.x + 5, this.y + 6) == 0)
+				return true;
+		}
+	},
+	attack() {
+		if (player.facing == "r") {
+			axe.x = player.x + 6;
+			axe.y = player.y - 2;
+			axe.flip = 0;
+		}
 
-    if (player.facing == "l") {
-      axe.x = player.x - 8;
-      axe.y = player.y - 2;
-      axe.flip = 1;
-    }
+		if (player.facing == "l") {
+			axe.x = player.x - 8;
+			axe.y = player.y - 2;
+			axe.flip = 1;
+		}
 
-    if (player.facing == "u") {
-      axe.x = player.x + 2;
-      axe.y = player.y - 5;
-      axe.flip = 3;
-    }
+		if (player.facing == "u") {
+			axe.x = player.x + 2;
+			axe.y = player.y - 5;
+			axe.flip = 3;
+		}
 
-    if (player.facing == "d") {
-      axe.x = player.x + 2;
-      axe.y = player.y + 6;
-      axe.flip = 4;
-    }
+		if (player.facing == "d") {
+			axe.x = player.x + 2;
+			axe.y = player.y + 6;
+			axe.flip = 4;
+		}
 
-    if (btn(4) && axe.cooldown <= 0) {
-      axe.cooldown = 30;
-      spr(axe.spr[0], axe.x, axe.y, 0, 1, axe.flip);
-    } else if (axe.cooldown > 15) {
-      axe.cooldown--;
-      spr(axe.spr[0], axe.x, axe.y, 0, 1, axe.flip);
-    } else if (axe.cooldown > 0) {
-      axe.cooldown--;
-      axe.rotation = 0;
-      spr(axe.spr[1], axe.x, axe.y, 0, 1, axe.flip, axe.rotation);
-    }
-  }
+		if (btn(4) && axe.cooldown <= 0) {
+			axe.cooldown = 30;
+			spr(axe.spr[0], axe.x, axe.y, 0, 1, axe.flip);
+		} else if (axe.cooldown > 15) {
+			axe.cooldown--;
+			spr(axe.spr[0], axe.x, axe.y, 0, 1, axe.flip);
+		} else if (axe.cooldown > 0) {
+			axe.cooldown--;
+			axe.rotation = 0;
+			spr(axe.spr[1], axe.x, axe.y, 0, 1, axe.flip, axe.rotation);
+		}
+	}
 };
 
 const axe = {
-  x: 0,
-  y: 0,
-  spr: [272, 273],
-  rotation: 0,
-  flip: 0,
-  hitEnemy: function() {
-    //do stuff
-  },
-  cooldown: 0
+	x: 0,
+	y: 0,
+	spr: [272, 273],
+	rotation: 0,
+	flip: 0,
+	hitEnemy: function () {
+		//do stuff
+	},
+	cooldown: 0
 };
 
+const isFirstRun = true;
+
 function TIC() {
+	init();
 	cls();
 	//drawTestmap();
 	//most params are default, just manually entered them cuz not sure what they all did tbh
-	map(0,0,30,17,0,0,-1,1,null);
+	map(0, 0, 30, 17, 0, 0, -1, 1, null);
+	updateSacs();
 	updatePlayer();
 	spr(player.spr, player.x, player.y, 0);
 }
 
+function init() {
+	if (isFirstRun) {
+		populateSacs();
+		isFirstRun = false;
+	}
+}
+
 function updatePlayer() {
-  player.stop();
-  player.move();
-  player.attack();
+	player.stop();
+	player.move();
+	player.attack();
+}
+
+function updateSacs() {
+	for (var i = 0; i < sacs.length; i++) {
+		sacs[i].stop();
+		sacs[i].move();
+		spr(sacs[i].spr, sacs[i].x, sacs[i].y, 0);
+	}
 }
 
 // <TILES>
