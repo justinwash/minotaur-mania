@@ -4,9 +4,9 @@
 // script: js
 
 const sprId = {
-	PLAYER = 256,
-	AXE = 272,
-	SACRIFICE = 257,
+	PLAYER: 256,
+	AXE: 272,
+	SACRIFICE: 257
 }
 
 const gameState = {
@@ -34,7 +34,7 @@ function sacrifice() {
 	(this.y = 0),
 	(this.dx = 0),
 	(this.dy = 0),
-	(this.spr = sprid.SACRIFICE),
+	(this.spr = sprId.SACRIFICE),
 	(this.health = 100),
 	(this.speed = 1);
 
@@ -145,6 +145,14 @@ function populateSacrifices() {
 	for (var i = 0; i < 2; i++) {
 		person = new sacrifice();
 		sacrifices.push(person);
+	}
+}
+
+function hurtSacrifice(index, dmg) {
+	var enemy = sacrifices[index]
+	enemy.health -= dmg
+	if (enemy.health <= 0) {
+		sacrifices.splice(index, 1)
 	}
 }
 
