@@ -8,7 +8,7 @@ const gameState = {
 	gameStart: false,
 	gameStartTimer: 180,
 	play: true,
-	difficulty: 1,
+	difficulty: 15,
 	waveCleared: false,
 	gameOver: false
 };
@@ -22,15 +22,15 @@ const spawnLocation = [
 const sacrifices = [];
 
 function sacrifice() {
-	this.x = 0,
-		this.y = 0,
-		this.dx = 0,
-		this.dy = 0,
-		this.spr = 263,
-		this.health = 100,
-		this.speed = 1;
+	(this.x = 0),
+		(this.y = 0),
+		(this.dx = 0),
+		(this.dy = 0),
+		(this.spr = 263),
+		(this.health = 100),
+		(this.speed = 1);
 
-	this.spawn = function () {
+	this.spawn = function() {
 		var index = Math.floor(Math.random() * spawnLocation.length);
 		var notAllUsed = false;
 
@@ -47,16 +47,13 @@ function sacrifice() {
 			if (notAllUsed) {
 				this.spawn(); //if some locations are not used, then try to spawn again
 			}
-
 		} else {
 			this.x = spawnLocation[index].x;
 			this.y = spawnLocation[index].y;
-
-			trace("Creating sacrifice on: " + this.x + ", " + this.y);
-
 			spr(this.spr, this.x, this.y, 0);
 			spawnLocation[index].used = true;
 		}
+	};
 
 	}
 
@@ -123,9 +120,7 @@ function sacrifice() {
 			}
 		}
 
-	}
-
-	this.stop = function () {
+	this.stop = function() {
 		//reset
 		this.dx = 0;
 		this.dy = 0;
@@ -145,7 +140,7 @@ function populateSacrifices() {
 
 const waveTimer = {
 	remaining: 3600, //60sec at 60fps
-	tick: function (rate) {
+	tick: function(rate) {
 		this.remaining = this.remaining - rate;
 	}
 };
@@ -173,18 +168,26 @@ function canMove(direction) {
 }
 
 const player = {
-	x: 24,
+	x: 8,
 	y: 16,
 	dx: 0,
 	dy: 0,
 	facing: 'r',
 	spr: 256,
-	lives: 3,
 	health: 100,
 	attacking: false,
 	speed: 1,
 	halted: false,
-	move: function () {
+	reset: function() {
+		this.x = 8;
+		this.y = 16;
+		this.dx = 0;
+		this.dy = 0;
+		this.health = 100;
+		this.attacking = false;
+		this.halted = false;
+	},
+	move: function() {
 		if (!this.halted) {
 			if (this.canMoveDir('u')) {
 				if (btn(0)) {
@@ -215,7 +218,7 @@ const player = {
 			this.y += this.dy;
 		}
 	},
-	stop: function () {
+	stop: function() {
 		this.dx = 0;
 		this.dy = 0;
 	},
@@ -285,7 +288,7 @@ const axe = {
 	spr: [272],
 	rotation: [0, 0],
 	flip: 0,
-	hitEnemy: function () {
+	hitEnemy: function() {
 		//do stuff
 	},
 	cooldown: 0
@@ -296,6 +299,7 @@ function drawTitleScreen() {
 
 	if (btn(4)) {
 		gameState.gameStart = true;
+		player.reset();
 	}
 
 	var button = 'A';
@@ -315,8 +319,9 @@ function drawTitleScreen() {
 		gameState.title = false;
 	}
 
-	print('MINITAUR MANIA', 86, 60);
-	print('press [' + button + '] to start', 76, 80);
+	print('MINITAUR MANIA', 86, 45);
+	print('press [' + button + '] to start', 76, 65);
+	print('press [X] to skip intro', 66, 85);
 }
 
 function drawGameOverScreen() {
@@ -324,6 +329,13 @@ function drawGameOverScreen() {
 
 	if (btn(4)) {
 		gameState.gameStart = true;
+		player.reset();
+	}
+
+	if (btn(5)) {
+		gameState.gameOver = false;
+		gameState.title = true;
+		player.reset();
 	}
 
 	var button = 'A';
@@ -343,8 +355,9 @@ function drawGameOverScreen() {
 		gameState.gameOver = false;
 	}
 
-	print('YOU FAILED TO CLAIM THE THRONE', 42, 60);
-	print('press [' + button + '] to try again', 71, 80);
+	print('YOU FAILED TO CLAIM THE THRONE', 42, 45);
+	print('press [' + button + '] to try again', 68, 65);
+	print('press [X] to give up', 75, 85);
 }
 
 const isFirstRun = true;
@@ -418,6 +431,43 @@ function drawUI() {
 
 // <TILES>
 // 000:3773777777773773337737737733377373373733377333733373773337337733
+// 202:7777770077777000777700067770006677700fff77700fff700000ff00000000
+// 203:0007777760077777600777770007777700000777ff000000ffff0000ffffffff
+// 204:77777777777777777777777777777777777777770000007700000000f4444000
+// 205:7777777777777777777777777777777777777777777777770077777000007000
+// 206:777777777777777770007777000007770060077700600777006007770ff00777
+// 216:7777777777777700777777047777770477777001777700117700011100011111
+// 217:7777777000077770440007004444000014444000111444401111444411111144
+// 218:0044400004444440044444444444444044444440044444400004444044004444
+// 219:00ffffff000ffff4000444440044444404444444000000040000000044444400
+// 220:44444444444444444444444444444444444444444eeee44444eeee4444444444
+// 221:40000000444000ff44444fff444444ff4444440044444000444ee0004444e004
+// 222:fff00777ff000777f00077770000077700000077000000074000400044004400
+// 223:7777777777777777777777777777777777777777777777777777777707777777
+// 232:01111111111111111111111111111111ff1111110ff1111100fff1117000fff1
+// 233:1111111411111111111111111111111111111111111111111111111111111111
+// 234:4440004414444004114444001114444411104444110000441104400410044400
+// 235:4004440000044440000444440044444440004400444000004444000404444400
+// 236:0444444400444444004444440044444400440004004440000004444440004444
+// 237:4444000044440000444400404444004444440044440000444440004444460444
+// 238:4400444004004440000044400000444444444444444444444000444444000444
+// 239:0777777707777777007777770007777740007777440007774440007744440007
+// 240:6600006666600666666666666666666666066066660660666600006666000066
+// 241:0666666006666660000660000006600000066000000660000666666006666660
+// 242:6600066066600660666606606666666066066660660066606600066066000660
+// 243:0066660006666660666006666600006666000066666006660666666000666600
+// 244:6666666666666666000660000006600000066000000660000006600000066000
+// 245:0066600006666600666066606600066066666660666666606600066066000660
+// 246:6600066066000660660006606600066066000660660006606666666006666600
+// 247:6666660066666660660006606600066066666660666666006600666066000666
+// 248:777000ff77777000777777707777777077777777777777777777777777777777
+// 249:f1111111ffff1111000ffff00000000000004444700000447770000077777000
+// 250:0044000004444000044444444444444444444444444444440000000000000000
+// 251:0044444000004400444000044444444444444400444400000000000400000444
+// 252:4400644444006666400066660004666600444664004446004004444444000444
+// 253:4466644466666444666644006664000064600004040004440000444444004444
+// 254:4440004444440004004440040004000440000044440004444440004444440004
+// 255:4444400044444400444444004444440044444400444440004444000744000077
 // 001:9999999999999999999999999999999900000000000000000000000000000000
 // 003:0000000000000000000000000000000099999999999999999999999999999999
 // 005:0000999900009999000099990000999900009999000099990000999900009999
@@ -474,4 +524,3 @@ function drawUI() {
 // <PALETTE>
 // 000:140c1cb2bab230346d847e6f854c30346524d04648757161597dced27d2c8595a16daa2cd2aa996dc2cadad45edeeed6
 // </PALETTE>
-
