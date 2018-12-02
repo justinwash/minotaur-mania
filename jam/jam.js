@@ -40,6 +40,15 @@ function drawTestmap() {
 	}
 }
 
+<<<<<<< HEAD
+const gameState = {
+	title: true,
+	play: true,
+	difficulty: 0.1,
+	waveCleared: false,
+	gameOver: false
+};
+=======
 const sacs = []
 
 const sac = {
@@ -108,6 +117,7 @@ function populateSacs() {
 		sacs[i] = sac;
 	}
 }
+>>>>>>> fc1184d6a2b8bc9ee3770694f909fdf00288d37d
 
 const waveTimer = {
 	remaining: 3600, //60sec at 60fps
@@ -235,10 +245,25 @@ const axe = {
 	cooldown: 0
 };
 
+<<<<<<< HEAD
+function drawTitleScreen() {
+	cls();
+	print('MINITAUR MANIA', 80, 60);
+	print('press [A] to start', 71, 80);
+}
+
+function TIC() {
+	if (gameState.title) {
+		drawTitleScreen();
+		return;
+	}
+
+=======
 const isFirstRun = true;
 
 function TIC() {
 	init();
+>>>>>>> fc1184d6a2b8bc9ee3770694f909fdf00288d37d
 	cls();
 	//drawTestmap();
 	//most params are default, just manually entered them cuz not sure what they all did tbh
