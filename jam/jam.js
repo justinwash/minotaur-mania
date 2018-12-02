@@ -40,6 +40,7 @@ function drawTestmap() {
 	}
 }
 
+<<<<<<< HEAD
 const gameState = {
 	title: true,
 	play: true,
@@ -47,6 +48,76 @@ const gameState = {
 	waveCleared: false,
 	gameOver: false
 };
+=======
+const sacs = []
+
+const sac = {
+	x: 0,
+	y: 0,
+	dx: 0,
+	dy: 0,
+	spr: 263,
+	health: 100,
+	speed: 1,
+	stop: function () {
+		this.dx = 0;
+		this.dy = 0;
+	},
+	move: function () {
+		/*
+		if (!this.halted) {
+			if (this.canMoveDir("u")) {
+				if (btn(0)) {
+					this.dy -= 0.5;
+					this.facing = "u";
+				}
+			}
+			if (this.canMoveDir("d")) {
+				if (btn(1)) {
+					this.dy += 0.5;
+					this.facing = "d";
+				}
+			}
+			if (this.canMoveDir("l")) {
+				if (btn(2)) {
+					this.dx -= 0.5;
+					this.facing = "l";
+				}
+			}
+			if (this.canMoveDir("r")) {
+				if (btn(3)) {
+					this.dx += 0.5;
+					this.facing = "r";
+				}
+			}
+
+			this.x += this.dx;
+			this.y += this.dy;
+		}
+		*/
+	},
+}
+
+const spawnLocation = [{ x: 100, y: 100, used: false }, { x: 200, y: 200, used: false }]
+
+function allocateSpawnsforSacs() {
+	var random = Math.floor(Math.random() * spawnLocation.length);
+	trace(random);
+	while (spawnLocation[random].used === true) {
+		random = Math.floor(Math.random() * spawnLocation.length);
+		spawnLocation[random].used = true;
+	}
+	return spawnLocation[random];
+}
+
+function populateSacs() {
+	for (var i = 0; i < 2; i++) {
+		sac.x = allocateSpawnsforSacs().x;
+		sac.y = allocateSpawnsforSacs().y;
+		sacs[i] = sac;
+	}
+}
+>>>>>>> fc1184d6a2b8bc9ee3770694f909fdf00288d37d
 
 const waveTimer = {
 	remaining: 3600, //60sec at 60fps
@@ -174,6 +245,7 @@ const axe = {
 	cooldown: 0
 };
 
+<<<<<<< HEAD
 function drawTitleScreen() {
 	cls();
 	print('MINITAUR MANIA', 80, 60);
@@ -186,14 +258,28 @@ function TIC() {
 		return;
 	}
 
+=======
+const isFirstRun = true;
+
+function TIC() {
+	init();
+>>>>>>> fc1184d6a2b8bc9ee3770694f909fdf00288d37d
 	cls();
 	//drawTestmap();
 	//most params are default, just manually entered them cuz not sure what they all did tbh
 	map(0, 0, 30, 17, 0, 0, -1, 1, null);
+	updateSacs();
 	waveTimer.tick(1);
 	drawUI();
 	updatePlayer();
 	drawPlayer();
+}
+
+function init() {
+	if (isFirstRun) {
+		populateSacs();
+		isFirstRun = false;
+	}
 }
 
 function updatePlayer() {
@@ -202,6 +288,11 @@ function updatePlayer() {
 	player.attack();
 }
 
+function updateSacs() {
+	for (var i = 0; i < sacs.length; i++) {
+		sacs[i].stop();
+		sacs[i].move();
+		spr(sacs[i].spr, sacs[i].x, sacs[i].y, 0);
 function drawPlayer() {
 	spr(player.spr, player.x, player.y, 0);
 }
