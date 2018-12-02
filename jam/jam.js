@@ -8,7 +8,7 @@ const gameState = {
 	gameStart: false,
 	gameStartTimer: 180,
 	play: true,
-	difficulty: 5,
+	difficulty: 1,
 	waveCleared: false,
 	gameOver: false
 };
@@ -52,7 +52,7 @@ function sacrifice() {
 			this.x = spawnLocation[index].x;
 			this.y = spawnLocation[index].y;
 
-		    trace("Creating sacrifice on: " + this.x + ", " + this.y);
+			trace("Creating sacrifice on: " + this.x + ", " + this.y);
 
 			spr(this.spr, this.x, this.y, 0);
 			spawnLocation[index].used = true;
@@ -60,7 +60,68 @@ function sacrifice() {
 
 	}
 
+
+	function getDirectionMapping(direction) {
+		switch (direction) {
+			case 0: {
+				return 'l';
+			}
+			case 1: {
+				return 'r';
+			}
+			case 2: {
+				return 'u';
+			}
+			case 3: {
+				return 'd';
+			}
+		}
+	}
+
 	this.move = function () {
+		//pick a direction to move
+		var directionChosen = false;
+		var direction = 0;
+		var counter = 0;
+
+		//check if can move in that direction, if not possible, go back to step 1
+		while (directionChosen === false) {
+			if (counter > 8) {
+				return;
+			}
+
+			direction = Math.floor(Math.random() * 4);
+
+			var boundCanMove = canMove.bind(this);
+
+			if (boundCanMove(getDirectionMapping(direction))) {
+				directionChosen = true;
+			}
+
+			counter++;
+		}
+
+		//move in said direction
+		var realDirection = getDirectionMapping(direction);
+
+		switch(realDirection) {
+			case 'u': {
+				this.dy -= this.speed;
+				break;
+			}
+			case 'd': {
+				this.dy += this.speed;
+				break;
+			}
+			case 'l': {
+				this.dx -= this.speed;
+				break;
+			}
+			case 'r': {
+				this.dx += this.speed;
+				break;
+			}
+		}
 
 	}
 
@@ -68,7 +129,7 @@ function sacrifice() {
 		//reset
 		this.dx = 0;
 		this.dy = 0;
-	}   
+	}
 
 	this.spawn();
 }
@@ -88,6 +149,28 @@ const waveTimer = {
 		this.remaining = this.remaining - rate;
 	}
 };
+
+function canMove(direction) {
+
+	//make sure you bind ;)
+
+	if (direction == 'l') {
+		if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 5) == 0)
+			return true;
+	}
+	if (direction == 'r') {
+		if (pix(this.x + 6, this.y) == 0 && pix(this.x + 6, this.y + 5) == 0)
+			return true;
+	}
+	if (direction == 'u') {
+		if (pix(this.x, this.y - 1) == 0 && pix(this.x + 5, this.y - 1) == 0)
+			return true;
+	}
+	if (direction == 'd') {
+		if (pix(this.x, this.y + 6) == 0 && pix(this.x + 5, this.y + 6) == 0)
+			return true;
+	}
+}
 
 const player = {
 	x: 24,
@@ -307,7 +390,9 @@ function updateSacs() {
 	for (var i = 0, len = sacrifices.length; i < len; i++) {
 		person = sacrifices[i];
 
-		spr(person.spr, person.x, person.y, 0);
+		person.move();
+
+		spr(person.spr, person.x + person.dx, person.y + person.dy, 0);
 	}
 }
 
