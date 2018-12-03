@@ -387,6 +387,9 @@ function drawGameOverScreen() {
 		gameState.gameWin = false;
 		gameState.title = false;
 		gameState.gameOver = false;
+		
+		sacrifices = [];
+		init();
 		player.reset();
 	}
 
@@ -400,6 +403,9 @@ function drawGameOverScreen() {
 		gameState.gameWin = false;
 		gameState.title = true;
 		gameState.gameOver = false;
+		
+		sacrifices=[];
+		init();
 		player.reset();
 	}
 
