@@ -3,6 +3,12 @@
 // desc:   sacrifices must be made
 // script: js
 
+const sprId = {
+	PLAYER: 256,
+	AXE: 272,
+	SACRIFICE: 257
+}
+
 const gameState = {
 	title: true,
 	story: false,
@@ -29,19 +35,17 @@ const sacrifices = [];
 const currentMusicTrack = -1;
 
 function sacrifice() {
-	this.x = 0;
-	this.y = 0;
-	this.dx = 0;
-	this.dy = 0;
-	this.spr = 257;
-	this.health = 100;
-	this.speed = 0.25;
-
+	this.x = 0,
+		this.y = 0,
+		this.dx = 0,
+		this.dy = 0,
+		this.spr = sprId.SACRIFICE,
+		this.health = 100,
+		this.speed = 0.25;
 	this.directions = ['u', 'd', 'l', 'r'];
 	this.randDirIndex = Math.floor(Math.random() * this.directions.length);
 	this.directionSwitchTimer = 30;
-
-	this.spawn = function() {
+	this.spawn = function () {
 		var index = Math.floor(Math.random() * spawnLocation.length);
 		var notAllUsed = false;
 
@@ -65,7 +69,7 @@ function sacrifice() {
 		}
 	};
 
-	this.move = function() {
+	this.move = function () {
 		if (this.directionSwitchTimer <= 0) {
 			this.directionSwitchTimer = 10;
 			while (!this.canMoveDir(this.directions[this.randDirIndex])) {
@@ -106,12 +110,12 @@ function sacrifice() {
 		}
 	};
 
-	this.stop = function() {
+	this.stop = function () {
 		this.dx = 0;
 		this.dy = 0;
 	};
 
-	this.canMoveDir = function(direction) {
+	this.canMoveDir = function (direction) {
 		if (direction == 'l') {
 			if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 3) == 0)
 				return true;
@@ -142,9 +146,17 @@ function populateSacrifices() {
 	}
 }
 
+function hurtSacrifice(index, dmg) {
+	var enemy = sacrifices[index]
+	enemy.health -= dmg
+	if (enemy.health <= 0) {
+		sacrifices.splice(index, 1)
+	}
+}
+
 const waveTimer = {
 	remaining: 3600, //60sec at 60fps
-	tick: function(rate) {
+	tick: function (rate) {
 		this.remaining = this.remaining - rate;
 	}
 };
@@ -176,12 +188,12 @@ const player = {
 	dx: 0,
 	dy: 0,
 	facing: 'r',
-	spr: 256,
+	spr: sprId.PLAYER,
 	health: 100,
 	attacking: false,
 	speed: 1,
 	halted: false,
-	reset: function() {
+	reset: function () {
 		this.x = 8;
 		this.y = 16;
 		this.dx = 0;
@@ -190,7 +202,7 @@ const player = {
 		this.attacking = false;
 		this.halted = false;
 	},
-	move: function() {
+	move: function () {
 		if (!this.halted) {
 			if (this.canMoveDir('u')) {
 				if (btn(0)) {
@@ -221,7 +233,7 @@ const player = {
 			this.y += this.dy;
 		}
 	},
-	stop: function() {
+	stop: function () {
 		this.dx = 0;
 		this.dy = 0;
 	},
@@ -272,7 +284,8 @@ const player = {
 			axe.rotation = [1, 2];
 		}
 
-		if (btn(4) && axe.cooldown <= 0) {
+		if (btnp(4) && axe.cooldown <= 0) {
+			axe.hitEnemy()
 			axe.cooldown = 30;
 			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[0]);
 		} else if (axe.cooldown > 15) {
@@ -288,11 +301,18 @@ const player = {
 const axe = {
 	x: 0,
 	y: 0,
-	spr: [272],
+	spr: [sprId.AXE],
 	rotation: [0, 0],
 	flip: 0,
-	hitEnemy: function() {
-		//do stuff
+	hitEnemy: function () {
+		for (var i = 0; i < sacrifices.length; i++) {
+			var sacrifice = sacrifices[i]
+			var xDiff = (sacrifice.x + 100) / (axe.x + 100);
+			var yDiff = (sacrifice.y + 100) / (axe.y + 100);
+			if (xDiff >= 0.95 && xDiff <= 1.05 && yDiff >= 0.95 && yDiff <= 1.05) {
+				hurtSacrifice(i, 100)
+			}
+		}
 	},
 	cooldown: 0
 };
