@@ -35,26 +35,13 @@ const sacrifices = [];
 const currentMusicTrack = -1;
 
 function sacrifice() {
-<<<<<<< HEAD
 	this.x = 0,
 	this.y = 0,
 	this.dx = 0,
 	this.dy = 0,
-	this.w = 4,
-	this.h = 4
 	this.spr = sprId.SACRIFICE,
 	this.health = 100,
-	this.speed = 1;
-=======
-	this.x = 0;
-	this.y = 0;
-	this.dx = 0;
-	this.dy = 0;
-	this.spr = 257;
-	this.health = 100;
 	this.speed = 0.25;
-
->>>>>>> integration
 	this.directions = ['u', 'd', 'l', 'r'];
 	this.randDirIndex = Math.floor(Math.random() * this.directions.length);
 	this.directionSwitchTimer = 30;
@@ -321,12 +308,9 @@ const axe = {
 	hitEnemy: function () {
 		for (var i = 0; i < sacrifices.length; i++) {
 			var sacrifice = sacrifices[i]
-			print("axe x: " + axe.x + ", y: " + axe.y + "\nsacrifice x: " + sacrifice.x + ", y: " + sacrifice.y)
-			if (
-				(axe.x <= sacrifice.x + sacrifice.w && axe.x >= sacrifice.x - sacrifice.w) &&
-				(axe.y <= sacrifice.y + sacrifice.h && axe.y >= sacrifice.y - sacrifice.h)
-			) {
-
+			var xDiff = (sacrifice.x + 100) / (axe.x + 100);
+			var yDiff = (sacrifice.y + 100) / (axe.y + 100);
+			if (xDiff >= 0.95 && xDiff <= 1.05 && yDiff >= 0.95 && yDiff <= 1.05) {
 				hurtSacrifice(i, 100)
 			}
 		}
