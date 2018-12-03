@@ -406,6 +406,7 @@ function drawGameOverScreen() {
 		gameState.gameStartTimer--;
 	} else {
 		gameState.gameOver = false;
+		gameOverTimer = 120;
 		playMusic(0);
 	}
 
@@ -476,6 +477,7 @@ function drawGameWinScreen() {
 		gameState.gameStart = false;
 		gameState.gameWin = false;
 		gameState.title = true;
+		winTimer = 120;
 		waveTimer.remaining = 3600;
 		player.reset();
 	} else winTimer--;
