@@ -298,6 +298,7 @@ const axe = {
 
 function drawTitleScreen() {
 	cls(0);
+	playMusic(1);
 
 	if (btnp(4)) {
 		gameState.story = true;
