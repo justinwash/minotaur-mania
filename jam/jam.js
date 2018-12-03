@@ -354,7 +354,7 @@ function drawTitleScreen() {
 	print('press [' + button2 + '] to skip intro', 66, 124);
 }
 
-const gameOverTimer = 120;
+const gameOverTimer = 60;
 function drawGameOverScreen() {
 	cls();
 	playMusic(1);
@@ -369,7 +369,7 @@ function drawGameOverScreen() {
 		gameState.gameWin = false;
 		gameState.title = false;
 		gameState.gameOver = false;
-
+		gameOverTimer = 60;
 		waveTimer.remaining = 3600;
 		sacrifices = [];
 		init();
@@ -384,7 +384,7 @@ function drawGameOverScreen() {
 		gameState.gameWin = false;
 		gameState.title = true;
 		gameState.gameOver = false;
-
+		gameOverTimer = 60;
 		waveTimer.remaining = 3600;
 		sacrifices = [];
 		init();
@@ -406,7 +406,7 @@ function drawGameOverScreen() {
 		gameState.gameStartTimer--;
 	} else {
 		gameState.gameOver = false;
-		gameOverTimer = 120;
+		gameOverTimer = 60;
 		playMusic(0);
 	}
 
@@ -464,7 +464,7 @@ function drawStory() {
 	}
 }
 
-const winTimer = 120;
+const winTimer = 60;
 function drawGameWinScreen() {
 	cls(0);
 
@@ -477,7 +477,7 @@ function drawGameWinScreen() {
 		gameState.gameStart = false;
 		gameState.gameWin = false;
 		gameState.title = true;
-		winTimer = 120;
+		winTimer = 60;
 		waveTimer.remaining = 3600;
 		player.reset();
 	} else winTimer--;
@@ -728,3 +728,4 @@ function playMusic(trackNumber) {
 // <PALETTE>
 // 000:140c1cb2bab230346d847e6f854c30346524d04648757161597dced27d2c8595a16daa2cd2aa996dc2cadad45edeeed6
 // </PALETTE>
+
