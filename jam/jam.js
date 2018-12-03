@@ -4,22 +4,22 @@
 // script: js
 
 const sprId = {
-	PLAYER: 256,
-	AXE: 272,
-	SACRIFICE: 257
-}
+	PLAYER    : 256,
+	AXE       : 272,
+	SACRIFICE : 257
+};
 
 const gameState = {
-	title: true,
-	story: false,
-	storyTimer: 1200,
-	gameStart: false,
-	gameWin: false,
-	gameStartTimer: 120,
-	play: true,
-	difficulty: 1,
-	waveCleared: false,
-	gameOver: false
+	title          : true,
+	story          : false,
+	storyTimer     : 1200,
+	gameStart      : false,
+	gameWin        : false,
+	gameStartTimer : 120,
+	play           : true,
+	difficulty     : 1,
+	waveCleared    : false,
+	gameOver       : false
 };
 
 const spawnLocation = [
@@ -35,17 +35,11 @@ const sacrifices = [];
 const currentMusicTrack = -1;
 
 function sacrifice() {
-	this.x = 0,
-		this.y = 0,
-		this.dx = 0,
-		this.dy = 0,
-		this.spr = sprId.SACRIFICE,
-		this.health = 100,
-		this.speed = 0.25;
-	this.directions = ['u', 'd', 'l', 'r'];
+	(this.x = 0), (this.y = 0), (this.dx = 0), (this.dy = 0), (this.spr = sprId.SACRIFICE), (this.health = 100), (this.speed = 0.25);
+	this.directions = [ 'u', 'd', 'l', 'r' ];
 	this.randDirIndex = Math.floor(Math.random() * this.directions.length);
 	this.directionSwitchTimer = 30;
-	this.spawn = function () {
+	this.spawn = function() {
 		var index = Math.floor(Math.random() * spawnLocation.length);
 		var notAllUsed = false;
 
@@ -69,7 +63,7 @@ function sacrifice() {
 		}
 	};
 
-	this.move = function () {
+	this.move = function() {
 		if (this.directionSwitchTimer <= 0) {
 			this.directionSwitchTimer = 10;
 			while (!this.canMoveDir(this.directions[this.randDirIndex])) {
@@ -110,27 +104,23 @@ function sacrifice() {
 		}
 	};
 
-	this.stop = function () {
+	this.stop = function() {
 		this.dx = 0;
 		this.dy = 0;
 	};
 
-	this.canMoveDir = function (direction) {
+	this.canMoveDir = function(direction) {
 		if (direction == 'l') {
-			if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 3) == 0)
-				return true;
+			if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 3) == 0) return true;
 		}
 		if (direction == 'r') {
-			if (pix(this.x + 4, this.y) == 0 && pix(this.x + 4, this.y + 3) == 0)
-				return true;
+			if (pix(this.x + 4, this.y) == 0 && pix(this.x + 4, this.y + 3) == 0) return true;
 		}
 		if (direction == 'u') {
-			if (pix(this.x, this.y - 1) == 0 && pix(this.x + 3, this.y - 1) == 0)
-				return true;
+			if (pix(this.x, this.y - 1) == 0 && pix(this.x + 3, this.y - 1) == 0) return true;
 		}
 		if (direction == 'd') {
-			if (pix(this.x, this.y + 4) == 0 && pix(this.x + 3, this.y + 4) == 0)
-				return true;
+			if (pix(this.x, this.y + 4) == 0 && pix(this.x + 3, this.y + 4) == 0) return true;
 		}
 	};
 
@@ -147,16 +137,16 @@ function populateSacrifices() {
 }
 
 function hurtSacrifice(index, dmg) {
-	var enemy = sacrifices[index]
-	enemy.health -= dmg
+	var enemy = sacrifices[index];
+	enemy.health -= dmg;
 	if (enemy.health <= 0) {
-		sacrifices.splice(index, 1)
+		sacrifices.splice(index, 1);
 	}
 }
 
 const waveTimer = {
-	remaining: 3600, //60sec at 60fps
-	tick: function (rate) {
+	remaining : 3600, //60sec at 60fps
+	tick      : function(rate) {
 		this.remaining = this.remaining - rate;
 	}
 };
@@ -165,35 +155,31 @@ function canMove(direction) {
 	//make sure you bind ;)
 
 	if (direction == 'l') {
-		if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 5) == 0)
-			return true;
+		if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 5) == 0) return true;
 	}
 	if (direction == 'r') {
-		if (pix(this.x + 6, this.y) == 0 && pix(this.x + 6, this.y + 5) == 0)
-			return true;
+		if (pix(this.x + 6, this.y) == 0 && pix(this.x + 6, this.y + 5) == 0) return true;
 	}
 	if (direction == 'u') {
-		if (pix(this.x, this.y - 1) == 0 && pix(this.x + 5, this.y - 1) == 0)
-			return true;
+		if (pix(this.x, this.y - 1) == 0 && pix(this.x + 5, this.y - 1) == 0) return true;
 	}
 	if (direction == 'd') {
-		if (pix(this.x, this.y + 6) == 0 && pix(this.x + 5, this.y + 6) == 0)
-			return true;
+		if (pix(this.x, this.y + 6) == 0 && pix(this.x + 5, this.y + 6) == 0) return true;
 	}
 }
 
 const player = {
-	x: 8,
-	y: 16,
-	dx: 0,
-	dy: 0,
-	facing: 'r',
-	spr: sprId.PLAYER,
-	health: 100,
-	attacking: false,
-	speed: 1,
-	halted: false,
-	reset: function () {
+	x          : 8,
+	y          : 16,
+	dx         : 0,
+	dy         : 0,
+	facing     : 'r',
+	spr        : sprId.PLAYER,
+	health     : 100,
+	attacking  : false,
+	speed      : 1,
+	halted     : false,
+	reset      : function() {
 		this.x = 8;
 		this.y = 16;
 		this.dx = 0;
@@ -202,7 +188,7 @@ const player = {
 		this.attacking = false;
 		this.halted = false;
 	},
-	move: function () {
+	move       : function() {
 		if (!this.halted) {
 			if (this.canMoveDir('u')) {
 				if (btn(0)) {
@@ -233,26 +219,22 @@ const player = {
 			this.y += this.dy;
 		}
 	},
-	stop: function () {
+	stop       : function() {
 		this.dx = 0;
 		this.dy = 0;
 	},
 	canMoveDir(direction) {
 		if (direction == 'l') {
-			if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 5) == 0)
-				return true;
+			if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 5) == 0) return true;
 		}
 		if (direction == 'r') {
-			if (pix(this.x + 6, this.y) == 0 && pix(this.x + 6, this.y + 5) == 0)
-				return true;
+			if (pix(this.x + 6, this.y) == 0 && pix(this.x + 6, this.y + 5) == 0) return true;
 		}
 		if (direction == 'u') {
-			if (pix(this.x, this.y - 1) == 0 && pix(this.x + 5, this.y - 1) == 0)
-				return true;
+			if (pix(this.x, this.y - 1) == 0 && pix(this.x + 5, this.y - 1) == 0) return true;
 		}
 		if (direction == 'd') {
-			if (pix(this.x, this.y + 6) == 0 && pix(this.x + 5, this.y + 6) == 0)
-				return true;
+			if (pix(this.x, this.y + 6) == 0 && pix(this.x + 5, this.y + 6) == 0) return true;
 		}
 	},
 	attack() {
@@ -260,32 +242,32 @@ const player = {
 			axe.x = player.x + 4;
 			axe.y = player.y - 1;
 			axe.flip = 0;
-			axe.rotation = [0, 1];
+			axe.rotation = [ 0, 1 ];
 		}
 
 		if (player.facing == 'l') {
 			axe.x = player.x - 6;
 			axe.y = player.y - 1;
 			axe.flip = 1;
-			axe.rotation = [0, 1];
+			axe.rotation = [ 0, 1 ];
 		}
 
 		if (player.facing == 'u') {
 			axe.x = player.x - 1;
 			axe.y = player.y - 6;
 			axe.flip = 3;
-			axe.rotation = [1, 2];
+			axe.rotation = [ 1, 2 ];
 		}
 
 		if (player.facing == 'd') {
 			axe.x = player.x - 1;
 			axe.y = player.y + 4;
 			axe.flip = 4;
-			axe.rotation = [1, 2];
+			axe.rotation = [ 1, 2 ];
 		}
 
 		if (btnp(4) && axe.cooldown <= 0) {
-			axe.hitEnemy()
+			axe.hitEnemy();
 			axe.cooldown = 30;
 			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[0]);
 		} else if (axe.cooldown > 15) {
@@ -299,22 +281,22 @@ const player = {
 };
 
 const axe = {
-	x: 0,
-	y: 0,
-	spr: [sprId.AXE],
-	rotation: [0, 0],
-	flip: 0,
-	hitEnemy: function () {
+	x        : 0,
+	y        : 0,
+	spr      : [ sprId.AXE ],
+	rotation : [ 0, 0 ],
+	flip     : 0,
+	hitEnemy : function() {
 		for (var i = 0; i < sacrifices.length; i++) {
-			var sacrifice = sacrifices[i]
+			var sacrifice = sacrifices[i];
 			var xDiff = (sacrifice.x + 100) / (axe.x + 100);
 			var yDiff = (sacrifice.y + 100) / (axe.y + 100);
 			if (xDiff >= 0.95 && xDiff <= 1.05 && yDiff >= 0.95 && yDiff <= 1.05) {
-				hurtSacrifice(i, 100)
+				hurtSacrifice(i, 100);
 			}
 		}
 	},
-	cooldown: 0
+	cooldown : 0
 };
 
 function drawTitleScreen() {
@@ -372,36 +354,42 @@ function drawTitleScreen() {
 	print('press [' + button2 + '] to skip intro', 66, 124);
 }
 
+const gameOverTimer = 60;
 function drawGameOverScreen() {
 	cls();
 	playMusic(1);
-	waveTimer.remaining = 3600;
 
-	if (btnp(4)) {
-	 for(i=0;i<spawnLocation.length;i++){
-		 spawnLocation[i].used = false;
+	if (btnp(4) && gameOverTimer <= 0) {
+		for (i = 0; i < spawnLocation.length; i++) {
+			spawnLocation[i].used = false;
 		}
-	 isFirstRun = true; 
+		isFirstRun = true;
 		gameState.story = false;
 		gameState.gameStart = true;
 		gameState.gameWin = false;
 		gameState.title = false;
 		gameState.gameOver = false;
+		gameOverTimer = 60;
+		waveTimer.remaining = 3600;
+		sacrifices = [];
+		init();
 		player.reset();
-	}
-
-	if (btnp(5)) {
-	 for(i=0;i<spawnLocation.length;i++){
-		 spawnLocation[i].used = false;
+	} else if (btnp(5) && gameOverTimer <= 0) {
+		for (i = 0; i < spawnLocation.length; i++) {
+			spawnLocation[i].used = false;
 		}
-	 isFirstRun = true; 
+		isFirstRun = true;
 		gameState.story = false;
 		gameState.gameStart = true;
 		gameState.gameWin = false;
 		gameState.title = true;
 		gameState.gameOver = false;
+		gameOverTimer = 60;
+		waveTimer.remaining = 3600;
+		sacrifices = [];
+		init();
 		player.reset();
-	}
+	} else gameOverTimer--;
 
 	var button = 'A';
 	if (!gameState.gameStart) {
@@ -418,6 +406,7 @@ function drawGameOverScreen() {
 		gameState.gameStartTimer--;
 	} else {
 		gameState.gameOver = false;
+		gameOverTimer = 60;
 		playMusic(0);
 	}
 
@@ -475,21 +464,23 @@ function drawStory() {
 	}
 }
 
+const winTimer = 60;
 function drawGameWinScreen() {
 	cls(0);
-	waveTimer.remaining = 3600;
 
-	if (btnp(4)) {
-	 for(i=0;i<spawnLocation.length;i++){
-		 spawnLocation[i].used = false;
+	if (btnp(4) && winTimer <= 0) {
+		for (i = 0; i < spawnLocation.length; i++) {
+			spawnLocation[i].used = false;
 		}
-	 isFirstRun = true; 
+		isFirstRun = true;
 		gameState.story = false;
 		gameState.gameStart = false;
 		gameState.gameWin = false;
 		gameState.title = true;
+		winTimer = 60;
+		waveTimer.remaining = 3600;
 		player.reset();
-	}
+	} else winTimer--;
 
 	print('THANK YOU FOR PLAYING', 65, 4);
 
@@ -546,11 +537,7 @@ function updatePlayer() {
 }
 
 function updateWinCondition() {
-	if (
-		gameState.gameStart &&
-		waveTimer.remaining > 0 &&
-		sacrifices.length <= 0
-	) {
+	if (gameState.gameStart && waveTimer.remaining > 0 && sacrifices.length <= 0) {
 		gameState.gameStart = false;
 		gameState.title = false;
 		gameState.story = false;
