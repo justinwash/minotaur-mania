@@ -36,16 +36,16 @@ const currentMusicTrack = -1;
 
 function sacrifice() {
 	this.x = 0,
-	this.y = 0,
-	this.dx = 0,
-	this.dy = 0,
-	this.spr = sprId.SACRIFICE,
-	this.health = 100,
-	this.speed = 0.25;
+		this.y = 0,
+		this.dx = 0,
+		this.dy = 0,
+		this.spr = sprId.SACRIFICE,
+		this.health = 100,
+		this.speed = 0.25;
 	this.directions = ['u', 'd', 'l', 'r'];
 	this.randDirIndex = Math.floor(Math.random() * this.directions.length);
 	this.directionSwitchTimer = 30;
-	this.spawn = function() {
+	this.spawn = function () {
 		var index = Math.floor(Math.random() * spawnLocation.length);
 		var notAllUsed = false;
 
@@ -69,7 +69,7 @@ function sacrifice() {
 		}
 	};
 
-	this.move = function() {
+	this.move = function () {
 		if (this.directionSwitchTimer <= 0) {
 			this.directionSwitchTimer = 10;
 			while (!this.canMoveDir(this.directions[this.randDirIndex])) {
@@ -115,7 +115,7 @@ function sacrifice() {
 		this.dy = 0;
 	};
 
-	this.canMoveDir = function(direction) {
+	this.canMoveDir = function (direction) {
 		if (direction == 'l') {
 			if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 3) == 0)
 				return true;
@@ -286,7 +286,6 @@ const player = {
 
 		if (btnp(4) && axe.cooldown <= 0) {
 			axe.hitEnemy()
-			print("axe x: " + axe.x + ", y: " + axe.y)
 			axe.cooldown = 30;
 			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[0]);
 		} else if (axe.cooldown > 15) {
