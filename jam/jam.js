@@ -298,6 +298,7 @@ const axe = {
 
 function drawTitleScreen() {
 	cls(0);
+	playMusic(1);
 
 	if (btnp(4)) {
 		gameState.story = true;
@@ -325,7 +326,6 @@ function drawTitleScreen() {
 		gameState.gameStartTimer--;
 	} else {
 		gameState.title = false;
-		playMusic(1);
 	}
 
 	var button2 = 'B';
