@@ -8,6 +8,7 @@ const gameState = {
 	story: false,
 	storyTimer: 1200,
 	gameStart: false,
+	gameWin: false,
 	gameStartTimer: 120,
 	play: true,
 	difficulty: 1,
@@ -425,6 +426,25 @@ function drawStory() {
 	}
 }
 
+function drawGameWinScreen() {
+	cls(0);
+
+	if (btnp(4)) {
+		gameState.story = false;
+		gameState.gameStart = false;
+		gameState.gameWin = false;
+		gameState.title = true;
+		player.reset();
+	}
+
+	print('THANK YOU FOR PLAYING', 65, 4);
+
+	map(210, 120, 60, 60, 60, 15, 7, 2, null);
+
+	print('YOU HAVE CONSUMED THE NECESSARY SACRIFICES', 3, 118);
+	print('press [A] to play again.', 63, 128);
+}
+
 const isFirstRun = true;
 
 function TIC() {
@@ -442,6 +462,10 @@ function TIC() {
 		drawGameOverScreen();
 		return;
 	}
+	if (gameState.gameWin) {
+		drawGameWinScreen();
+		return;
+	}
 	cls();
 	//drawTestmap();
 	//most params are default, just manually entered them cuz not sure what they all did tbh
@@ -451,6 +475,7 @@ function TIC() {
 	drawUI();
 	updatePlayer();
 	drawPlayer();
+	updateWinCondition();
 }
 
 function init() {
@@ -464,6 +489,21 @@ function updatePlayer() {
 	player.stop();
 	player.move();
 	player.attack();
+}
+
+function updateWinCondition() {
+	if (
+		gameState.gameStart &&
+		waveTimer.remaining > 0 &&
+		sacrifices.length <= 0
+	) {
+		gameState.gameStart = false;
+		gameState.title = false;
+		gameState.story = false;
+		gameState.gameOver = false;
+
+		gameState.gameWin = true;
+	}
 }
 
 function updateSacs() {
