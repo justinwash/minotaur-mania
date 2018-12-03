@@ -24,19 +24,24 @@ const gameState = {
 const spawnLocation = [
 	{ x: 100, y: 100, used: false },
 	{ x: 50, y: 50, used: false },
-	{ x: 75, y: 75, used: false }
+	{ x: 75, y: 75, used: false },
+	{ x: 200, y: 120, used: false },
+	{ x: 180, y: 100, used: false }
 ];
 
 const sacrifices = [];
 
 function sacrifice() {
-	(this.x = 0),
-	(this.y = 0),
-	(this.dx = 0),
-	(this.dy = 0),
-	(this.spr = sprId.SACRIFICE),
-	(this.health = 100),
-	(this.speed = 1);
+	this.x = 0,
+	this.y = 0,
+	this.dx = 0,
+	this.dy = 0,
+	this.spr = sprId.SACRIFICE,
+	this.health = 100,
+	this.speed = 1;
+	this.directions = ['u', 'd', 'l', 'r'];
+	this.randDirIndex = Math.floor(Math.random() * this.directions.length);
+	this.directionSwitchTimer = 30;
 
 	this.spawn = function() {
 		var index = Math.floor(Math.random() * spawnLocation.length);
@@ -58,85 +63,73 @@ function sacrifice() {
 		} else {
 			this.x = spawnLocation[index].x;
 			this.y = spawnLocation[index].y;
-			spr(this.spr, this.x, this.y, 0);
 			spawnLocation[index].used = true;
 		}
 	};
 
-	function getDirectionMapping(direction) {
-		switch (direction) {
-			case 0: {
-				return 'l';
-			}
-			case 1: {
-				return 'r';
-			}
-			case 2: {
-				return 'u';
-			}
-			case 3: {
-				return 'd';
-			}
-		}
-	}
-
 	this.move = function() {
-		if((waveTimer.remaining % 16) === 0) {
-		
-		//pick a direction to move
-		var directionChosen = false;
-		var direction = 0;
-		var counter = 0;
-
-		//check if can move in that direction, if not possible, go back to step 1
-		while (directionChosen === false) {
-			if (counter > 8) {
-				return;
-			}
-
-			direction = Math.floor(Math.random() * 4);
-
-			var boundCanMove = canMove.bind(this);
-
-			if (boundCanMove(getDirectionMapping(direction))) {
-				directionChosen = true;
-			}
-
-			counter++;
+		if (this.directionSwitchTimer <= 0) {
+			this.directionSwitchTimer = 30;
+			this.randDirIndex = Math.floor(Math.random() * this.directions.length);
+		} else {
+			this.directionSwitchTimer--;
 		}
-	
 
-		//move in said direction
-		var realDirection = getDirectionMapping(direction);
+		if (!this.halted) {
+			if (this.canMoveDir('u')) {
+				if (this.directions[this.randDirIndex] === 'u') {
+					this.dy -= 0.5;
+					this.facing = 'u';
+				}
+			}
+			if (this.canMoveDir('d')) {
+				if (this.directions[this.randDirIndex] === 'd') {
+					this.dy += 0.5;
+					this.facing = 'd';
+				}
+			}
+			if (this.canMoveDir('l')) {
+				if (this.directions[this.randDirIndex] === 'l') {
+					this.dx -= 0.5;
+					this.facing = 'l';
+				}
+			}
+			if (this.canMoveDir('r')) {
+				if (this.directions[this.randDirIndex] === 'r') {
+					this.dx += 0.5;
+					this.facing = 'r';
+				}
+			}
 
-		switch (realDirection) {
-			case 'u': {
-				this.dy -= this.speed;
-				break;
-			}
-			case 'd': {
-				this.dy += this.speed;
-				break;
-			}
-			case 'l': {
-				this.dx -= this.speed;
-				break;
-			}
-			case 'r': {
-				this.dx += this.speed;
-				break;
-			}
+			this.x += this.dx;
+			this.y += this.dy;
 		}
-	}
 	};
 
 	this.stop = function() {
-		//reset
 		this.dx = 0;
 		this.dy = 0;
 	};
 
-	this.spawn();
+	(this.canMoveDir = function(direction) {
+		if (direction == 'l') {
+			if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 3) == 0)
+				return true;
+		}
+		if (direction == 'r') {
+			if (pix(this.x + 4, this.y) == 0 && pix(this.x + 4, this.y + 3) == 0)
+				return true;
+		}
+		if (direction == 'u') {
+			if (pix(this.x, this.y - 1) == 0 && pix(this.x + 3, this.y - 1) == 0)
+				return true;
+		}
+		if (direction == 'd') {
+			if (pix(this.x, this.y + 4) == 0 && pix(this.x + 3, this.y + 4) == 0)
+				return true;
+		}
+	}),
+		this.spawn();
 }
 
 function populateSacrifices() {
@@ -414,7 +407,7 @@ function drawStory() {
 		print('the chance to reclaim your humanity', 27, 20);
 		print('by consuming the sacrifices and heroes', 18, 30);
 		print('tossed before you.', 68, 40);
-		print('Even more, as your power grows you', 30, 60);
+		print('Even more, as your power grows, you', 28, 60);
 		print('may one day come to rule over those', 27, 70);
 		print('who made you an outcast...', 56, 80);
 
@@ -491,10 +484,10 @@ function updateSacs() {
 
 	for (var i = 0, len = sacrifices.length; i < len; i++) {
 		person = sacrifices[i];
-
+		person.stop();
 		person.move();
 
-		spr(person.spr, person.x + person.dx, person.y + person.dy, 0);
+		spr(person.spr + i, person.x, person.y, 0);
 	}
 }
 
@@ -512,10 +505,13 @@ function updateTimer() {
 }
 
 function drawUI() {
-	print('WAVE:', 164, 0, 1);
+	print('TIME:', 164, 0, 1);
 	for (i = 0; i < waveTimer.remaining / 75; i++) {
 		rect(192 + i, 0, 1, 5, 1);
 	}
+
+	print('SACRIFICES: ' + sacrifices.length, 60, 0, 1);
+	print('LVL: ' + gameState.difficulty, 0, 0, 1);
 }
 
 // <TILES>
@@ -575,14 +571,18 @@ function drawUI() {
 
 // <SPRITES>
 // 000:ffffff0000440000444444000444400004444000040040000000000000000000
-// 001:000000000cc00cc08888eeee08800ee0000000000cc00cc06666999906600990
-// 002:000000000cc00cc02222dddd02200dd0000000000cc00cc0bbbb55550bb00550
-// 003:00000000044004408888eeee08800ee000000000044004406666999906600990
-// 004:00000000044004402222dddd02200dd00000000004400440bbbb55550bb00550
+// 001:000000000cc00000888800000880000000000000000000000000000000000000
+// 002:000000000cc00000222200000220000000000000000000000000000000000000
+// 003:0000000004400000888800000880000000000000000000000000000000000000
+// 004:0000000004400000222200000220000000000000000000000000000000000000
 // 005:0cc00440a9eaa9ea0e900e900aa00aa00cc00440a6faa6fa0f600f600aa00aa0
 // 006:0cc00440af2aaf2a02f002f00aa00aa00cc00440ab5aab5a05b005b00aa00aa0
 // 007:000000000000000000000000000ee000000ee000000000000000000000000000
 // 016:0000000000411100004111000040110000400000004000000040000000000000
+// 017:000000000cc00000666600000660000000000000000000000000000000000000
+// 018:000000000cc00000bbbb00000bb0000000000000000000000000000000000000
+// 019:0000000004400000666600000660000000000000000000000000000000000000
+// 020:0000000004400000bbbb00000bb0000000000000000000000000000000000000
 // 096:4444000044440000444400004444000000000000000000000000000000000000
 // </SPRITES>
 
@@ -630,4 +630,3 @@ function drawUI() {
 // <PALETTE>
 // 000:140c1cb2bab230346d847e6f854c30346524d04648757161597dced27d2c8595a16daa2cd2aa996dc2cadad45edeeed6
 // </PALETTE>
-
