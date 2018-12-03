@@ -17,11 +17,11 @@ const gameState = {
 };
 
 const spawnLocation = [
-	{ x: 100, y: 100, used: false },
+	{ x: 210, y: 60, used: false },
 	{ x: 50, y: 50, used: false },
 	{ x: 75, y: 75, used: false },
-	{ x: 200, y: 120, used: false },
-	{ x: 180, y: 100, used: false }
+	{ x: 200, y: 124, used: false },
+	{ x: 180, y: 106, used: false }
 ];
 
 const sacrifices = [];
@@ -35,7 +35,7 @@ function sacrifice() {
 	this.dy = 0;
 	this.spr = 257;
 	this.health = 100;
-	this.speed = 1;
+	this.speed = 0.25;
 
 	this.directions = ['u', 'd', 'l', 'r'];
 	this.randDirIndex = Math.floor(Math.random() * this.directions.length);
@@ -67,8 +67,10 @@ function sacrifice() {
 
 	this.move = function() {
 		if (this.directionSwitchTimer <= 0) {
-			this.directionSwitchTimer = 30;
-			this.randDirIndex = Math.floor(Math.random() * this.directions.length);
+			this.directionSwitchTimer = 10;
+			while (!this.canMoveDir(this.directions[this.randDirIndex])) {
+				this.randDirIndex = Math.floor(Math.random() * this.directions.length);
+			}
 		} else {
 			this.directionSwitchTimer--;
 		}
@@ -76,25 +78,25 @@ function sacrifice() {
 		if (!this.halted) {
 			if (this.canMoveDir('u')) {
 				if (this.directions[this.randDirIndex] === 'u') {
-					this.dy -= 0.5;
+					this.dy -= this.speed * gameState.difficulty;
 					this.facing = 'u';
 				}
 			}
 			if (this.canMoveDir('d')) {
 				if (this.directions[this.randDirIndex] === 'd') {
-					this.dy += 0.5;
+					this.dy += this.speed * gameState.difficulty;
 					this.facing = 'd';
 				}
 			}
 			if (this.canMoveDir('l')) {
 				if (this.directions[this.randDirIndex] === 'l') {
-					this.dx -= 0.5;
+					this.dx -= this.speed * gameState.difficulty;
 					this.facing = 'l';
 				}
 			}
 			if (this.canMoveDir('r')) {
 				if (this.directions[this.randDirIndex] === 'r') {
-					this.dx += 0.5;
+					this.dx += this.speed * gameState.difficulty;
 					this.facing = 'r';
 				}
 			}
@@ -133,7 +135,7 @@ function sacrifice() {
 function populateSacrifices() {
 	var person = void 0;
 
-	for (var i = 0; i < 2; i++) {
+	for (var i = 0; i < spawnLocation.length; i++) {
 		person = new sacrifice();
 		sacrifices.push(person);
 	}
@@ -350,7 +352,7 @@ function drawTitleScreen() {
 function drawGameOverScreen() {
 	cls();
 	playMusic(1);
-  
+
 	if (btnp(4)) {
 		gameState.gameStart = true;
 		player.reset();
@@ -387,7 +389,7 @@ function drawGameOverScreen() {
 
 function drawStory() {
 	cls();
-	
+
 	if (gameState.storyTimer > 600) {
 		print('Bastard of man and bull, you have been', 16, 10);
 		print('exiled to a remote labyrinth in Crete.', 20, 20);
@@ -617,14 +619,13 @@ function playMusic(trackNumber) {
 // 002:000000000cc00000222200000220000000000000000000000000000000000000
 // 003:0000000004400000888800000880000000000000000000000000000000000000
 // 004:0000000004400000222200000220000000000000000000000000000000000000
-// 005:0cc00440a9eaa9ea0e900e900aa00aa00cc00440a6faa6fa0f600f600aa00aa0
-// 006:0cc00440af2aaf2a02f002f00aa00aa00cc00440ab5aab5a05b005b00aa00aa0
-// 007:000000000000000000000000000ee000000ee000000000000000000000000000
+// 005:000000000cc00000666600000660000000000000000000000000000000000000
+// 006:000000000cc00000bbbb00000bb0000000000000000000000000000000000000
+// 007:0000000004400000666600000660000000000000000000000000000000000000
+// 008:0000000004400000bbbb00000bb0000000000000000000000000000000000000
 // 016:0000000000411100004111000040110000400000004000000040000000000000
-// 017:000000000cc00000666600000660000000000000000000000000000000000000
-// 018:000000000cc00000bbbb00000bb0000000000000000000000000000000000000
-// 019:0000000004400000666600000660000000000000000000000000000000000000
-// 020:0000000004400000bbbb00000bb0000000000000000000000000000000000000
+// 032:0cc00440a9eaa9ea0e900e900aa00aa00cc00440a6faa6fa0f600f600aa00aa0
+// 033:0cc00440af2aaf2a02f002f00aa00aa00cc00440ab5aab5a05b005b00aa00aa0
 // 096:4444000044440000444400004444000000000000000000000000000000000000
 // </SPRITES>
 
@@ -695,4 +696,3 @@ function playMusic(trackNumber) {
 // <PALETTE>
 // 000:140c1cb2bab230346d847e6f854c30346524d04648757161597dced27d2c8595a16daa2cd2aa996dc2cadad45edeeed6
 // </PALETTE>
-
