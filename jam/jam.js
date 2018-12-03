@@ -36,13 +36,14 @@ function sacrifice() {
 	this.y = 0,
 	this.dx = 0,
 	this.dy = 0,
+	this.w = 4,
+	this.h = 4
 	this.spr = sprId.SACRIFICE,
 	this.health = 100,
 	this.speed = 1;
 	this.directions = ['u', 'd', 'l', 'r'];
 	this.randDirIndex = Math.floor(Math.random() * this.directions.length);
 	this.directionSwitchTimer = 30;
-
 	this.spawn = function() {
 		var index = Math.floor(Math.random() * spawnLocation.length);
 		var notAllUsed = false;
@@ -106,7 +107,7 @@ function sacrifice() {
 		}
 	};
 
-	this.stop = function() {
+	this.stop = function () {
 		this.dx = 0;
 		this.dy = 0;
 	};
@@ -151,7 +152,7 @@ function hurtSacrifice(index, dmg) {
 
 const waveTimer = {
 	remaining: 3600, //60sec at 60fps
-	tick: function(rate) {
+	tick: function (rate) {
 		this.remaining = this.remaining - rate;
 	}
 };
@@ -188,7 +189,7 @@ const player = {
 	attacking: false,
 	speed: 1,
 	halted: false,
-	reset: function() {
+	reset: function () {
 		this.x = 8;
 		this.y = 16;
 		this.dx = 0;
@@ -197,7 +198,7 @@ const player = {
 		this.attacking = false;
 		this.halted = false;
 	},
-	move: function() {
+	move: function () {
 		if (!this.halted) {
 			if (this.canMoveDir('u')) {
 				if (btn(0)) {
@@ -228,7 +229,7 @@ const player = {
 			this.y += this.dy;
 		}
 	},
-	stop: function() {
+	stop: function () {
 		this.dx = 0;
 		this.dy = 0;
 	},
@@ -279,7 +280,9 @@ const player = {
 			axe.rotation = [1, 2];
 		}
 
-		if (btn(4) && axe.cooldown <= 0) {
+		if (btnp(4) && axe.cooldown <= 0) {
+			axe.hitEnemy()
+			print("axe x: " + axe.x + ", y: " + axe.y)
 			axe.cooldown = 30;
 			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[0]);
 		} else if (axe.cooldown > 15) {
@@ -298,8 +301,18 @@ const axe = {
 	spr: [sprId.AXE],
 	rotation: [0, 0],
 	flip: 0,
-	hitEnemy: function() {
-		//do stuff
+	hitEnemy: function () {
+		for (var i = 0; i < sacrifices.length; i++) {
+			var sacrifice = sacrifices[i]
+			print("axe x: " + axe.x + ", y: " + axe.y + "\nsacrifice x: " + sacrifice.x + ", y: " + sacrifice.y)
+			if (
+				(axe.x <= sacrifice.x + sacrifice.w && axe.x >= sacrifice.x - sacrifice.w) &&
+				(axe.y <= sacrifice.y + sacrifice.h && axe.y >= sacrifice.y - sacrifice.h)
+			) {
+
+				hurtSacrifice(i, 100)
+			}
+		}
 	},
 	cooldown: 0
 };
