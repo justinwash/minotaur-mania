@@ -111,7 +111,7 @@ function sacrifice() {
 		this.dy = 0;
 	};
 
-	(this.canMoveDir = function(direction) {
+	this.canMoveDir = function(direction) {
 		if (direction == 'l') {
 			if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 3) == 0)
 				return true;
@@ -128,8 +128,9 @@ function sacrifice() {
 			if (pix(this.x, this.y + 4) == 0 && pix(this.x + 3, this.y + 4) == 0)
 				return true;
 		}
-	}),
-		this.spawn();
+	};
+
+	this.spawn();
 }
 
 function populateSacrifices() {
