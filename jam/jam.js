@@ -320,6 +320,7 @@ const axe = {
 function drawTitleScreen() {
 	cls(0);
 	playMusic(1);
+	waveTimer.remaining = 3600;
 
 	if (btnp(4)) {
 		gameState.story = true;
@@ -374,15 +375,31 @@ function drawTitleScreen() {
 function drawGameOverScreen() {
 	cls();
 	playMusic(1);
+	waveTimer.remaining = 3600;
 
 	if (btnp(4)) {
+	 for(i=0;i<spawnLocation.length;i++){
+		 spawnLocation[i].used = false;
+		}
+	 isFirstRun = true; 
+		gameState.story = false;
 		gameState.gameStart = true;
+		gameState.gameWin = false;
+		gameState.title = false;
+		gameState.gameOver = false;
 		player.reset();
 	}
 
 	if (btnp(5)) {
-		gameState.gameOver = false;
+	 for(i=0;i<spawnLocation.length;i++){
+		 spawnLocation[i].used = false;
+		}
+	 isFirstRun = true; 
+		gameState.story = false;
+		gameState.gameStart = true;
+		gameState.gameWin = false;
 		gameState.title = true;
+		gameState.gameOver = false;
 		player.reset();
 	}
 
@@ -411,6 +428,7 @@ function drawGameOverScreen() {
 
 function drawStory() {
 	cls();
+	waveTimer.remaining = 3600;
 
 	if (gameState.storyTimer > 600) {
 		print('Bastard of man and bull, you have been', 16, 10);
@@ -459,8 +477,13 @@ function drawStory() {
 
 function drawGameWinScreen() {
 	cls(0);
+	waveTimer.remaining = 3600;
 
 	if (btnp(4)) {
+	 for(i=0;i<spawnLocation.length;i++){
+		 spawnLocation[i].used = false;
+		}
+	 isFirstRun = true; 
 		gameState.story = false;
 		gameState.gameStart = false;
 		gameState.gameWin = false;
@@ -718,3 +741,4 @@ function playMusic(trackNumber) {
 // <PALETTE>
 // 000:140c1cb2bab230346d847e6f854c30346524d04648757161597dced27d2c8595a16daa2cd2aa996dc2cadad45edeeed6
 // </PALETTE>
+
