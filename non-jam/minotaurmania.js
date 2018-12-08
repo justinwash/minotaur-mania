@@ -46,7 +46,6 @@ function Game() {
     cls();
     level.drawMap();
     updateSacs();
-    updateTimer();
     drawUI();
     updatePlayer();
     drawPlayer();
@@ -56,7 +55,16 @@ function Game() {
 
 const isFirstRun = true;
 const level = null;
+const currentMusicTrack = -1;
 const game = new Game();
+const move = new MovementController();
+
+const waveTimer = {
+  remaining: 3600, //60sec at 60fps
+  tick: function(rate) {
+    this.remaining = this.remaining - rate;
+  }
+};
 
 function TIC() {
   if (isFirstRun) init();
@@ -66,6 +74,7 @@ function TIC() {
 function init() {
   game.state = game.title;
   level = new Level(0, 1);
+  waveTimer.remaining = 3600;
   player.x = level.map.start.x;
   player.y = level.map.start.y;
   isFirstRun = false;
@@ -137,7 +146,7 @@ function Sacrifice() {
   this.spr = sprId.SACRIFICE;
   this.health = 100;
   this.speed = 0.25;
-  this.directions = ["u", "d", "l", "r"];
+  this.directions = ['u', 'd', 'l', 'r'];
   this.randDirIndex = Math.floor(Math.random() * this.directions.length);
   this.directionSwitchTimer = 30;
   this.spawn = function(spawns) {
@@ -145,17 +154,14 @@ function Sacrifice() {
     var notAllUsed = false;
 
     if (spawns[index].used === true) {
-      //already been used
-      //check if any remain unused. If so, recurse. Else, don't spawn.
-
-      for (var i = 0, len = spawns.length; i < len; i++) {
+      for (i = 0; i < spawns.length; i++) {
         if (spawns[i].used === false) {
           notAllUsed = true;
         }
       }
 
       if (notAllUsed) {
-        this.spawn(spawns); //if some locations are not used, then try to spawn again
+        this.spawn(spawns);
       }
     } else {
       this.x = spawns[index].x;
@@ -175,28 +181,28 @@ function Sacrifice() {
     }
 
     if (!this.halted) {
-      if (this.canMoveDir("u")) {
-        if (this.directions[this.randDirIndex] === "u") {
+      if (this.canMoveDir('u')) {
+        if (this.directions[this.randDirIndex] === 'u') {
           this.dy -= this.speed * level.difficulty;
-          this.facing = "u";
+          this.facing = 'u';
         }
       }
-      if (this.canMoveDir("d")) {
-        if (this.directions[this.randDirIndex] === "d") {
+      if (this.canMoveDir('d')) {
+        if (this.directions[this.randDirIndex] === 'd') {
           this.dy += this.speed * level.difficulty;
-          this.facing = "d";
+          this.facing = 'd';
         }
       }
-      if (this.canMoveDir("l")) {
-        if (this.directions[this.randDirIndex] === "l") {
+      if (this.canMoveDir('l')) {
+        if (this.directions[this.randDirIndex] === 'l') {
           this.dx -= this.speed * level.difficulty;
-          this.facing = "l";
+          this.facing = 'l';
         }
       }
-      if (this.canMoveDir("r")) {
-        if (this.directions[this.randDirIndex] === "r") {
+      if (this.canMoveDir('r')) {
+        if (this.directions[this.randDirIndex] === 'r') {
           this.dx += this.speed * level.difficulty;
-          this.facing = "r";
+          this.facing = 'r';
         }
       }
 
@@ -211,22 +217,54 @@ function Sacrifice() {
   };
 
   this.canMoveDir = function(direction) {
-    if (direction == "l") {
-      if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 3) == 0)
-        return true;
+    if (direction == 'l') {
+      if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 3) == 0) return true;
     }
-    if (direction == "r") {
-      if (pix(this.x + 4, this.y) == 0 && pix(this.x + 4, this.y + 3) == 0)
-        return true;
+    if (direction == 'r') {
+      if (pix(this.x + 4, this.y) == 0 && pix(this.x + 4, this.y + 3) == 0) return true;
     }
-    if (direction == "u") {
-      if (pix(this.x, this.y - 1) == 0 && pix(this.x + 3, this.y - 1) == 0)
-        return true;
+    if (direction == 'u') {
+      if (pix(this.x, this.y - 1) == 0 && pix(this.x + 3, this.y - 1) == 0) return true;
     }
-    if (direction == "d") {
-      if (pix(this.x, this.y + 4) == 0 && pix(this.x + 3, this.y + 4) == 0)
-        return true;
+    if (direction == 'd') {
+      if (pix(this.x, this.y + 4) == 0 && pix(this.x + 3, this.y + 4) == 0) return true;
     }
+  };
+}
+
+function MovementController() {
+  this.checkCollision = function(entity) {
+    var availableDirections = [];
+
+    if (pix(entity.x - 1, entity.y) == 0 && pix(entity.x - 1, entity.y + entity.h - 1) == 0) availableDirections.push('l');
+    if (pix(entity.x + entity.w, entity.y) == 0 && pix(entity.x + entity.w - 1, entity.y + entity.h - 1) == 0) availableDirections.push('r');
+    if (pix(entity.x, entity.y - 1) == 0 && pix(entity.x + entity.w - 1, entity.y - 1) == 0) availableDirections.push('u');
+    if (pix(entity.x, entity.y + entity.h) == 0 && pix(entity.x + entity.w - 1, entity.y + entity.h) == 0) availableDirections.push('d');
+
+    return availableDirections;
+  };
+
+  this.moveEntity = function(entity, directions) {
+    var availableDirections = this.checkCollision(entity);
+    if (directions.indexOf('u') > -1 && availableDirections.indexOf('u') > -1) {
+      entity.dy -= 0.5;
+      entity.facing = 'u';
+    }
+    if (directions.indexOf('d') > -1 && availableDirections.indexOf('d') > -1) {
+      entity.dy += 0.5;
+      entity.facing = 'd';
+    }
+    if (directions.indexOf('l') > -1 && availableDirections.indexOf('l') > -1) {
+      entity.dx -= 0.5;
+      entity.facing = 'l';
+    }
+    if (directions.indexOf('r') > -1 && availableDirections.indexOf('r') > -1) {
+      entity.dx += 0.5;
+      entity.facing = 'r';
+    }
+
+    entity.x += entity.dx;
+    entity.y += entity.dy;
   };
 }
 
@@ -234,41 +272,13 @@ function hurtSacrifice(index, dmg) {
   var enemy = level.sacrifices[index];
   enemy.health -= dmg;
   if (enemy.health <= 0) {
-    waveTimer.remaining += 1000;
+    waveTimer.remaining += 200;
     if (waveTimer.remaining >= 3600) {
       waveTimer.remaining = 3600;
     }
     level.sacrifices.splice(index, 1);
   }
-  sfx(11, "C-7", -1, 2, 15, 0); // hurt sacrifice sfx
-}
-
-const waveTimer = {
-  remaining: 3600, //60sec at 60fps
-  tick: function(rate) {
-    this.remaining = this.remaining - rate;
-  }
-};
-
-function canMove(direction) {
-  //make sure you bind ;)
-
-  if (direction == "l") {
-    if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 5) == 0)
-      return true;
-  }
-  if (direction == "r") {
-    if (pix(this.x + 6, this.y) == 0 && pix(this.x + 6, this.y + 5) == 0)
-      return true;
-  }
-  if (direction == "u") {
-    if (pix(this.x, this.y - 1) == 0 && pix(this.x + 5, this.y - 1) == 0)
-      return true;
-  }
-  if (direction == "d") {
-    if (pix(this.x, this.y + 6) == 0 && pix(this.x + 5, this.y + 6) == 0)
-      return true;
-  }
+  sfx(11, 'C-7', -1, 2, 15, 0); // hurt sacrifice sfx
 }
 
 const player = {
@@ -276,7 +286,9 @@ const player = {
   y: 16,
   dx: 0,
   dy: 0,
-  facing: "r",
+  w: 6,
+  h: 6,
+  facing: 'r',
   spr: sprId.PLAYER,
   health: 100,
   attacking: false,
@@ -293,80 +305,50 @@ const player = {
   },
   move: function() {
     if (!this.halted) {
-      if (this.canMoveDir("u")) {
-        if (btn(0)) {
-          this.dy -= 0.5;
-          this.facing = "u";
-        }
+      var pressedDirections = [];
+      if (btn(0)) {
+        pressedDirections.push('u');
       }
-      if (this.canMoveDir("d")) {
-        if (btn(1)) {
-          this.dy += 0.5;
-          this.facing = "d";
-        }
+      if (btn(1)) {
+        pressedDirections.push('d');
       }
-      if (this.canMoveDir("l")) {
-        if (btn(2)) {
-          this.dx -= 0.5;
-          this.facing = "l";
-        }
+      if (btn(2)) {
+        pressedDirections.push('l');
       }
-      if (this.canMoveDir("r")) {
-        if (btn(3)) {
-          this.dx += 0.5;
-          this.facing = "r";
-        }
+      if (btn(3)) {
+        pressedDirections.push('r');
       }
 
-      this.x += this.dx;
-      this.y += this.dy;
+      move.moveEntity(this, pressedDirections);
     }
   },
   stop: function() {
     this.dx = 0;
     this.dy = 0;
   },
-  canMoveDir(direction) {
-    if (direction == "l") {
-      if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 5) == 0)
-        return true;
-    }
-    if (direction == "r") {
-      if (pix(this.x + 6, this.y) == 0 && pix(this.x + 6, this.y + 5) == 0)
-        return true;
-    }
-    if (direction == "u") {
-      if (pix(this.x, this.y - 1) == 0 && pix(this.x + 5, this.y - 1) == 0)
-        return true;
-    }
-    if (direction == "d") {
-      if (pix(this.x, this.y + 6) == 0 && pix(this.x + 5, this.y + 6) == 0)
-        return true;
-    }
-  },
   attack() {
-    if (player.facing == "r") {
+    if (player.facing == 'r') {
       axe.x = player.x + 4;
       axe.y = player.y - 1;
       axe.flip = 0;
       axe.rotation = [0, 1];
     }
 
-    if (player.facing == "l") {
+    if (player.facing == 'l') {
       axe.x = player.x - 6;
       axe.y = player.y - 1;
       axe.flip = 1;
       axe.rotation = [0, 1];
     }
 
-    if (player.facing == "u") {
+    if (player.facing == 'u') {
       axe.x = player.x - 1;
       axe.y = player.y - 6;
       axe.flip = 3;
       axe.rotation = [1, 2];
     }
 
-    if (player.facing == "d") {
+    if (player.facing == 'd') {
       axe.x = player.x - 1;
       axe.y = player.y + 4;
       axe.flip = 4;
@@ -402,7 +384,7 @@ const axe = {
         hurtSacrifice(i, 100);
       }
     }
-    sfx(10, "E-5", -1, 1, 15, 0); // swing axe sfx
+    sfx(10, 'E-5', -1, 1, 15, 0); // swing axe sfx
   },
   cooldown: 0
 };
@@ -413,17 +395,17 @@ function drawTitleScreen() {
   if (btnp(4)) {
     player.reset();
     game.state = game.story;
-    sfx(11, "C-7", -1, 1, 15, 0);
+    sfx(11, 'C-7', -1, 1, 15, 0);
   }
   if (btnp(5)) {
     game.state = game.play;
-    sfx(11, "C-7", -1, 1, 15, 0);
+    sfx(11, 'C-7', -1, 1, 15, 0);
   }
 
   map(210, 120, 60, 60, 60, 10, 7, 2, null);
 
-  print("press [A] to start", 76, 114);
-  print("press [B] to skip intro", 66, 124);
+  print('press [A] to start', 76, 114);
+  print('press [B] to skip intro', 66, 124);
 }
 
 const gameOverTimer = 60;
@@ -438,32 +420,32 @@ function drawGameOverScreen() {
     game.state = game.title;
   } else gameOverTimer--;
 
-  print("YOU FAILED TO CLAIM THE THRONE", 42, 45);
-  print("press [A] to try again", 68, 65);
-  print("press [B] to give up", 75, 85);
+  print('YOU FAILED TO CLAIM THE THRONE', 42, 45);
+  print('press [A] to try again', 68, 65);
+  print('press [B] to give up', 75, 85);
 }
 
 function drawStory() {
   cls();
 
   if (gameState.storyTimer > 600) {
-    print("Bastard of man and bull, you have been", 16, 10);
-    print("exiled to a remote labyrinth in Crete.", 20, 20);
-    print("A freak, a menace, an outcast.", 40, 40);
-    print("But while your appearance may seem bestial,", 4, 60);
-    print("your heart...", 86, 70);
-    print("is human...", 176, 120);
+    print('Bastard of man and bull, you have been', 16, 10);
+    print('exiled to a remote labyrinth in Crete.', 20, 20);
+    print('A freak, a menace, an outcast.', 40, 40);
+    print('But while your appearance may seem bestial,', 4, 60);
+    print('your heart...', 86, 70);
+    print('is human...', 176, 120);
     gameState.storyTimer--;
   } else {
-    print("But the Gods have shown mercy, giving you", 12, 10);
-    print("the chance to reclaim your humanity", 27, 20);
-    print("by consuming the sacrifices and heroes", 18, 30);
-    print("tossed before you.", 68, 40);
-    print("Even more, as your power grows, you", 28, 60);
-    print("may one day come to rule over those", 27, 70);
-    print("who made you an outcast...", 56, 80);
+    print('But the Gods have shown mercy, giving you', 12, 10);
+    print('the chance to reclaim your humanity', 27, 20);
+    print('by consuming the sacrifices and heroes', 18, 30);
+    print('tossed before you.', 68, 40);
+    print('Even more, as your power grows, you', 28, 60);
+    print('may one day come to rule over those', 27, 70);
+    print('who made you an outcast...', 56, 80);
 
-    print("press [A] to start", 76, 114);
+    print('press [A] to start', 76, 114);
 
     if (btnp(4)) {
       game.state = game.play;
@@ -480,12 +462,12 @@ function drawGameWinScreen() {
     game.state = game.title;
   } else winTimer--;
 
-  print("THANK YOU FOR PLAYING", 65, 4);
+  print('THANK YOU FOR PLAYING', 65, 4);
 
   map(210, 120, 60, 60, 60, 15, 7, 2, null);
 
-  print("YOU HAVE CONSUMED THE NECESSARY SACRIFICES", 3, 118);
-  print("press [A] to play again.", 63, 128);
+  print('YOU HAVE CONSUMED THE NECESSARY SACRIFICES', 3, 118);
+  print('press [A] to play again.', 63, 128);
 }
 
 function updatePlayer() {
@@ -495,10 +477,12 @@ function updatePlayer() {
 }
 
 function updateWinCondition() {
+  waveTimer.tick(level.difficulty);
   if (waveTimer.remaining > 0 && level.sacrifices.length <= 0) {
     init();
     game.state = game.win;
   } else if (waveTimer.remaining <= 0) {
+    init();
     game.state = game.gameOver;
   }
 }
@@ -519,22 +503,14 @@ function drawPlayer() {
   spr(player.spr, player.x, player.y, 0);
 }
 
-function updateTimer() {
-  waveTimer.tick(level.difficulty);
-  if (waveTimer.remaining <= 0) {
-    game.state = game.gameOver;
-    waveTimer.remaining = 3600;
-  }
-}
-
 function drawUI() {
-  print("TIME:", 164, 0, 1);
+  print('TIME:', 164, 0, 1);
   for (i = 0; i < waveTimer.remaining / 75; i++) {
     rect(192 + i, 0, 1, 5, 1);
   }
 
-  print("SACRIFICES: " + level.sacrifices.length, 60, 0, 1);
-  print("LVL: " + level.map.id + 1, 0, 0, 1);
+  print('SACRIFICES: ' + level.sacrifices.length, 60, 0, 1);
+  print('LVL: ' + (level.map.id + 1), 0, 0, 1);
 }
 
 function playMusic(trackNumber) {
