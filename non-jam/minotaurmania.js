@@ -4,53 +4,53 @@
 // script: js
 
 const sprId = {
-	PLAYER: 256,
-	AXE: 272,
-	SACRIFICE: 257
+  PLAYER: 256,
+  AXE: 272,
+  SACRIFICE: 257
 };
 
 const currentMusicTrack = -1;
 
 const gameState = {
-	title: true,
-	story: false,
-	storyTimer: 1200,
-	gameStart: false,
-	gameWin: false,
-	gameStartTimer: 120,
-	play: true,
-	difficulty: 2,
-	waveCleared: false,
-	gameOver: false
+  title: true,
+  story: false,
+  storyTimer: 1200,
+  gameStart: false,
+  gameWin: false,
+  gameStartTimer: 120,
+  play: true,
+  difficulty: 2,
+  waveCleared: false,
+  gameOver: false
 };
 
 function Game() {
-	this.state = function() {};
+  this.state = function() {};
 
-	this.title = function() {
-		playMusic(1);
-		drawTitleScreen();
-	};
-	this.story = function() {
-		drawStory();
-	};
-	this.gameOver = function() {
-		playMusic(0);
-		drawGameOverScreen();
-	};
-	this.win = function() {
-		drawGameWinScreen();
-	};
-	this.play = function() {
-		playMusic(0);
-		cls();
-		level.drawMap();
-		updateSacs();
-		drawUI();
-		updatePlayer();
-		drawPlayer();
-		updateWinCondition();
-	};
+  this.title = function() {
+    playMusic(1);
+    drawTitleScreen();
+  };
+  this.story = function() {
+    drawStory();
+  };
+  this.gameOver = function() {
+    playMusic(0);
+    drawGameOverScreen();
+  };
+  this.win = function() {
+    drawGameWinScreen();
+  };
+  this.play = function() {
+    playMusic(0);
+    cls();
+    level.drawMap();
+    updateSacs();
+    drawUI();
+    updatePlayer();
+    drawPlayer();
+    updateWinCondition();
+  };
 }
 
 const isFirstRun = true;
@@ -60,469 +60,469 @@ const game = new Game();
 const move = new MovementController();
 
 const waveTimer = {
-	remaining: 3600, //60sec at 60fps
-	tick: function(rate) {
-		this.remaining = this.remaining - rate;
-	}
+  remaining: 3600, //60sec at 60fps
+  tick: function(rate) {
+    this.remaining = this.remaining - rate;
+  }
 };
 
 function TIC() {
-	if (isFirstRun) init();
-	game.state();
+  if (isFirstRun) init();
+  game.state();
 }
 
 function init() {
-	game.state = game.title;
-	level = new Level(0, 1);
-	waveTimer.remaining = 3600;
-	player.x = level.map.start.x;
-	player.y = level.map.start.y;
-	isFirstRun = false;
+  game.state = game.title;
+  level = new Level(0, 1);
+  waveTimer.remaining = 3600;
+  player.x = level.map.start.x;
+  player.y = level.map.start.y;
+  isFirstRun = false;
 }
 
 function Level(id, difficulty) {
-	this.maps = [
-		{
-			id: 0,
-			x: 0,
-			y: 0,
-			start: {
-				x: 12,
-				y: 16
-			},
-			spawns: [
-				{ x: 210, y: 60, used: false },
-				{ x: 50, y: 50, used: false },
-				{ x: 75, y: 75, used: false },
-				{ x: 200, y: 124, used: false },
-				{ x: 180, y: 106, used: false }
-			]
-		},
-		{
-			id: 1,
-			x: 0,
-			y: 0,
-			start: {
-				x: 12,
-				y: 16
-			},
-			spawns: [
-				{ x: 210, y: 60, used: false },
-				{ x: 50, y: 50, used: false },
-				{ x: 75, y: 75, used: false },
-				{ x: 200, y: 124, used: false },
-				{ x: 180, y: 106, used: false }
-			]
-		}
-	];
+  this.maps = [
+    {
+      id: 0,
+      x: 0,
+      y: 0,
+      start: {
+        x: 12,
+        y: 16
+      },
+      spawns: [
+        { x: 210, y: 60, used: false },
+        { x: 50, y: 50, used: false },
+        { x: 75, y: 75, used: false },
+        { x: 200, y: 124, used: false },
+        { x: 180, y: 106, used: false }
+      ]
+    },
+    {
+      id: 1,
+      x: 0,
+      y: 0,
+      start: {
+        x: 12,
+        y: 16
+      },
+      spawns: [
+        { x: 210, y: 60, used: false },
+        { x: 50, y: 50, used: false },
+        { x: 75, y: 75, used: false },
+        { x: 200, y: 124, used: false },
+        { x: 180, y: 106, used: false }
+      ]
+    }
+  ];
 
-	this.drawMap = function() {
-		map(this.map.x, this.map.y, 30, 17, 0, 0, -1, 1, null);
-	};
+  this.drawMap = function() {
+    map(this.map.x, this.map.y, 30, 17, 0, 0, -1, 1, null);
+  };
 
-	this.sacrifices = [];
+  this.sacrifices = [];
 
-	this.populateSacrifices = function() {
-		var sacrifice = void 0;
+  this.populateSacrifices = function() {
+    var sacrifice = void 0;
 
-		for (var i = 0; i < this.map.spawns.length; i++) {
-			sacrifice = new Sacrifice();
-			sacrifice.spawn(this.map.spawns);
-			this.sacrifices.push(sacrifice);
-		}
-	};
+    for (var i = 0; i < this.map.spawns.length; i++) {
+      sacrifice = new Sacrifice();
+      sacrifice.spawn(this.map.spawns);
+      this.sacrifices.push(sacrifice);
+    }
+  };
 
-	this.map = this.maps[id];
-	this.difficulty = difficulty;
+  this.map = this.maps[id];
+  this.difficulty = difficulty;
 
-	this.populateSacrifices();
+  this.populateSacrifices();
 }
 
 function Sacrifice() {
-	this.x = 0;
-	this.y = 0;
-	this.dx = 0;
-	this.dy = 0;
-	this.spr = sprId.SACRIFICE;
-	this.health = 100;
-	this.speed = 0.25;
-	this.directions = [ 'u', 'd', 'l', 'r' ];
-	this.randDirIndex = Math.floor(Math.random() * this.directions.length);
-	this.directionSwitchTimer = 30;
-	this.spawn = function(spawns) {
-		var index = Math.floor(Math.random() * spawns.length);
-		var notAllUsed = false;
+  this.x = 0;
+  this.y = 0;
+  this.dx = 0;
+  this.dy = 0;
+  this.spr = sprId.SACRIFICE;
+  this.health = 100;
+  this.speed = 0.25;
+  this.directions = ['u', 'd', 'l', 'r'];
+  this.randDirIndex = Math.floor(Math.random() * this.directions.length);
+  this.directionSwitchTimer = 30;
+  this.spawn = function(spawns) {
+    var index = Math.floor(Math.random() * spawns.length);
+    var notAllUsed = false;
 
-		if (spawns[index].used === true) {
-			for (i = 0; i < spawns.length; i++) {
-				if (spawns[i].used === false) {
-					notAllUsed = true;
-				}
-			}
+    if (spawns[index].used === true) {
+      for (i = 0; i < spawns.length; i++) {
+        if (spawns[i].used === false) {
+          notAllUsed = true;
+        }
+      }
 
-			if (notAllUsed) {
-				this.spawn(spawns);
-			}
-		} else {
-			this.x = spawns[index].x;
-			this.y = spawns[index].y;
-			spawns[index].used = true;
-		}
-	};
+      if (notAllUsed) {
+        this.spawn(spawns);
+      }
+    } else {
+      this.x = spawns[index].x;
+      this.y = spawns[index].y;
+      spawns[index].used = true;
+    }
+  };
 
-	this.move = function() {
-		if (this.directionSwitchTimer <= 0) {
-			this.directionSwitchTimer = 10;
-			while (!this.canMoveDir(this.directions[this.randDirIndex])) {
-				this.randDirIndex = Math.floor(Math.random() * this.directions.length);
-			}
-		} else {
-			this.directionSwitchTimer--;
-		}
+  this.move = function() {
+    if (this.directionSwitchTimer <= 0) {
+      this.directionSwitchTimer = 10;
+      while (!this.canMoveDir(this.directions[this.randDirIndex])) {
+        this.randDirIndex = Math.floor(Math.random() * this.directions.length);
+      }
+    } else {
+      this.directionSwitchTimer--;
+    }
 
-		if (!this.halted) {
-			if (this.canMoveDir('u')) {
-				if (this.directions[this.randDirIndex] === 'u') {
-					this.dy -= this.speed * level.difficulty;
-					this.facing = 'u';
-				}
-			}
-			if (this.canMoveDir('d')) {
-				if (this.directions[this.randDirIndex] === 'd') {
-					this.dy += this.speed * level.difficulty;
-					this.facing = 'd';
-				}
-			}
-			if (this.canMoveDir('l')) {
-				if (this.directions[this.randDirIndex] === 'l') {
-					this.dx -= this.speed * level.difficulty;
-					this.facing = 'l';
-				}
-			}
-			if (this.canMoveDir('r')) {
-				if (this.directions[this.randDirIndex] === 'r') {
-					this.dx += this.speed * level.difficulty;
-					this.facing = 'r';
-				}
-			}
+    if (!this.halted) {
+      if (this.canMoveDir('u')) {
+        if (this.directions[this.randDirIndex] === 'u') {
+          this.dy -= this.speed * level.difficulty;
+          this.facing = 'u';
+        }
+      }
+      if (this.canMoveDir('d')) {
+        if (this.directions[this.randDirIndex] === 'd') {
+          this.dy += this.speed * level.difficulty;
+          this.facing = 'd';
+        }
+      }
+      if (this.canMoveDir('l')) {
+        if (this.directions[this.randDirIndex] === 'l') {
+          this.dx -= this.speed * level.difficulty;
+          this.facing = 'l';
+        }
+      }
+      if (this.canMoveDir('r')) {
+        if (this.directions[this.randDirIndex] === 'r') {
+          this.dx += this.speed * level.difficulty;
+          this.facing = 'r';
+        }
+      }
 
-			this.x += this.dx;
-			this.y += this.dy;
-		}
-	};
+      this.x += this.dx;
+      this.y += this.dy;
+    }
+  };
 
-	this.stop = function() {
-		this.dx = 0;
-		this.dy = 0;
-	};
+  this.stop = function() {
+    this.dx = 0;
+    this.dy = 0;
+  };
 
-	this.canMoveDir = function(direction) {
-		if (direction == 'l') {
-			if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 3) == 0) return true;
-		}
-		if (direction == 'r') {
-			if (pix(this.x + 4, this.y) == 0 && pix(this.x + 4, this.y + 3) == 0) return true;
-		}
-		if (direction == 'u') {
-			if (pix(this.x, this.y - 1) == 0 && pix(this.x + 3, this.y - 1) == 0) return true;
-		}
-		if (direction == 'd') {
-			if (pix(this.x, this.y + 4) == 0 && pix(this.x + 3, this.y + 4) == 0) return true;
-		}
-	};
+  this.canMoveDir = function(direction) {
+    if (direction == 'l') {
+      if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 3) == 0) return true;
+    }
+    if (direction == 'r') {
+      if (pix(this.x + 4, this.y) == 0 && pix(this.x + 4, this.y + 3) == 0) return true;
+    }
+    if (direction == 'u') {
+      if (pix(this.x, this.y - 1) == 0 && pix(this.x + 3, this.y - 1) == 0) return true;
+    }
+    if (direction == 'd') {
+      if (pix(this.x, this.y + 4) == 0 && pix(this.x + 3, this.y + 4) == 0) return true;
+    }
+  };
 }
 
 function MovementController() {
-	this.checkCollision = function(entity) {
-		var availableDirections = [];
+  this.checkCollision = function(entity) {
+    var availableDirections = [];
 
-		if (pix(entity.x - 1, entity.y) == 0 && pix(entity.x - 1, entity.y + entity.h - 1) == 0)
-			availableDirections.push('l');
-		if (pix(entity.x + entity.w, entity.y) == 0 && pix(entity.x + entity.w - 1, entity.y + entity.h - 1) == 0)
-			availableDirections.push('r');
-		if (pix(entity.x, entity.y - 1) == 0 && pix(entity.x + entity.w - 1, entity.y - 1) == 0)
-			availableDirections.push('u');
-		if (pix(entity.x, entity.y + entity.h) == 0 && pix(entity.x + entity.w - 1, entity.y + entity.h) == 0)
-			availableDirections.push('d');
+    if (pix(entity.x - 1, entity.y) == 0 && pix(entity.x - 1, entity.y + entity.h - 1) == 0)
+      availableDirections.push('l');
+    if (pix(entity.x + entity.w, entity.y) == 0 && pix(entity.x + entity.w - 1, entity.y + entity.h - 1) == 0)
+      availableDirections.push('r');
+    if (pix(entity.x, entity.y - 1) == 0 && pix(entity.x + entity.w - 1, entity.y - 1) == 0)
+      availableDirections.push('u');
+    if (pix(entity.x, entity.y + entity.h) == 0 && pix(entity.x + entity.w - 1, entity.y + entity.h) == 0)
+      availableDirections.push('d');
 
-		return availableDirections;
-	};
+    return availableDirections;
+  };
 
-	this.moveEntity = function(entity, directions) {
-		var availableDirections = this.checkCollision(entity);
-		if (directions.indexOf('u') > -1 && availableDirections.indexOf('u') > -1) {
-			entity.dy -= 0.5;
-			entity.facing = 'u';
-		}
-		if (directions.indexOf('d') > -1 && availableDirections.indexOf('d') > -1) {
-			entity.dy += 0.5;
-			entity.facing = 'd';
-		}
-		if (directions.indexOf('l') > -1 && availableDirections.indexOf('l') > -1) {
-			entity.dx -= 0.5;
-			entity.facing = 'l';
-		}
-		if (directions.indexOf('r') > -1 && availableDirections.indexOf('r') > -1) {
-			entity.dx += 0.5;
-			entity.facing = 'r';
-		}
+  this.moveEntity = function(entity, directions) {
+    var availableDirections = this.checkCollision(entity);
+    if (directions.indexOf('u') > -1 && availableDirections.indexOf('u') > -1) {
+      entity.dy -= 0.5;
+      entity.facing = 'u';
+    }
+    if (directions.indexOf('d') > -1 && availableDirections.indexOf('d') > -1) {
+      entity.dy += 0.5;
+      entity.facing = 'd';
+    }
+    if (directions.indexOf('l') > -1 && availableDirections.indexOf('l') > -1) {
+      entity.dx -= 0.5;
+      entity.facing = 'l';
+    }
+    if (directions.indexOf('r') > -1 && availableDirections.indexOf('r') > -1) {
+      entity.dx += 0.5;
+      entity.facing = 'r';
+    }
 
-		entity.x += entity.dx;
-		entity.y += entity.dy;
-	};
+    entity.x += entity.dx;
+    entity.y += entity.dy;
+  };
 }
 
 function hurtSacrifice(index, dmg) {
-	var enemy = level.sacrifices[index];
-	enemy.health -= dmg;
-	if (enemy.health <= 0) {
-		waveTimer.remaining += 200;
-		if (waveTimer.remaining >= 3600) {
-			waveTimer.remaining = 3600;
-		}
-		level.sacrifices.splice(index, 1);
-	}
-	sfx(11, 'C-7', -1, 2, 15, 0); // hurt sacrifice sfx
+  var enemy = level.sacrifices[index];
+  enemy.health -= dmg;
+  if (enemy.health <= 0) {
+    waveTimer.remaining += 200;
+    if (waveTimer.remaining >= 3600) {
+      waveTimer.remaining = 3600;
+    }
+    level.sacrifices.splice(index, 1);
+  }
+  sfx(11, 'C-7', -1, 2, 15, 0); // hurt sacrifice sfx
 }
 
 const player = {
-	x: 8,
-	y: 16,
-	dx: 0,
-	dy: 0,
-	w: 6,
-	h: 6,
-	facing: 'r',
-	spr: sprId.PLAYER,
-	health: 100,
-	attacking: false,
-	speed: 1,
-	halted: false,
-	reset: function() {
-		this.x = 8;
-		this.y = 16;
-		this.dx = 0;
-		this.dy = 0;
-		this.health = 100;
-		this.attacking = false;
-		this.halted = false;
-	},
-	move: function() {
-		if (!this.halted) {
-			var pressedDirections = [];
-			if (btn(0)) {
-				pressedDirections.push('u');
-			}
-			if (btn(1)) {
-				pressedDirections.push('d');
-			}
-			if (btn(2)) {
-				pressedDirections.push('l');
-			}
-			if (btn(3)) {
-				pressedDirections.push('r');
-			}
+  x: 8,
+  y: 16,
+  dx: 0,
+  dy: 0,
+  w: 6,
+  h: 6,
+  facing: 'r',
+  spr: sprId.PLAYER,
+  health: 100,
+  attacking: false,
+  speed: 1,
+  halted: false,
+  reset: function() {
+    this.x = 8;
+    this.y = 16;
+    this.dx = 0;
+    this.dy = 0;
+    this.health = 100;
+    this.attacking = false;
+    this.halted = false;
+  },
+  move: function() {
+    if (!this.halted) {
+      var pressedDirections = [];
+      if (btn(0)) {
+        pressedDirections.push('u');
+      }
+      if (btn(1)) {
+        pressedDirections.push('d');
+      }
+      if (btn(2)) {
+        pressedDirections.push('l');
+      }
+      if (btn(3)) {
+        pressedDirections.push('r');
+      }
 
-			move.moveEntity(this, pressedDirections);
-		}
-	},
-	stop: function() {
-		this.dx = 0;
-		this.dy = 0;
-	},
-	attack() {
-		if (player.facing == 'r') {
-			axe.x = player.x + 4;
-			axe.y = player.y - 1;
-			axe.flip = 0;
-			axe.rotation = [ 0, 1 ];
-		}
+      move.moveEntity(this, pressedDirections);
+    }
+  },
+  stop: function() {
+    this.dx = 0;
+    this.dy = 0;
+  },
+  attack() {
+    if (player.facing == 'r') {
+      axe.x = player.x + 4;
+      axe.y = player.y - 1;
+      axe.flip = 0;
+      axe.rotation = [0, 1];
+    }
 
-		if (player.facing == 'l') {
-			axe.x = player.x - 6;
-			axe.y = player.y - 1;
-			axe.flip = 1;
-			axe.rotation = [ 0, 1 ];
-		}
+    if (player.facing == 'l') {
+      axe.x = player.x - 6;
+      axe.y = player.y - 1;
+      axe.flip = 1;
+      axe.rotation = [0, 1];
+    }
 
-		if (player.facing == 'u') {
-			axe.x = player.x - 1;
-			axe.y = player.y - 6;
-			axe.flip = 3;
-			axe.rotation = [ 1, 2 ];
-		}
+    if (player.facing == 'u') {
+      axe.x = player.x - 1;
+      axe.y = player.y - 6;
+      axe.flip = 3;
+      axe.rotation = [1, 2];
+    }
 
-		if (player.facing == 'd') {
-			axe.x = player.x - 1;
-			axe.y = player.y + 4;
-			axe.flip = 4;
-			axe.rotation = [ 1, 2 ];
-		}
+    if (player.facing == 'd') {
+      axe.x = player.x - 1;
+      axe.y = player.y + 4;
+      axe.flip = 4;
+      axe.rotation = [1, 2];
+    }
 
-		if (btnp(4) && axe.cooldown <= 0) {
-			axe.hitEnemy();
-			axe.cooldown = 30;
-			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[0]);
-		} else if (axe.cooldown > 15) {
-			axe.cooldown--;
-			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[0]);
-		} else if (axe.cooldown > 0) {
-			axe.cooldown--;
-			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[1]);
-		}
-	}
+    if (btnp(4) && axe.cooldown <= 0) {
+      axe.hitEnemy();
+      axe.cooldown = 30;
+      spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[0]);
+    } else if (axe.cooldown > 15) {
+      axe.cooldown--;
+      spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[0]);
+    } else if (axe.cooldown > 0) {
+      axe.cooldown--;
+      spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[1]);
+    }
+  }
 };
 
 const axe = {
-	x: 0,
-	y: 0,
-	spr: [ sprId.AXE ],
-	rotation: [ 0, 0 ],
-	flip: 0,
-	hitEnemy: function() {
-		for (var i = 0; i < level.sacrifices.length; i++) {
-			var sacrifice = level.sacrifices[i];
-			var xDiff = (sacrifice.x + 100) / (axe.x + 100);
-			var yDiff = (sacrifice.y + 100) / (axe.y + 100);
-			if (xDiff >= 0.95 && xDiff <= 1.05 && yDiff >= 0.95 && yDiff <= 1.05) {
-				hurtSacrifice(i, 100);
-			}
-		}
-		sfx(10, 'E-5', -1, 1, 15, 0); // swing axe sfx
-	},
-	cooldown: 0
+  x: 0,
+  y: 0,
+  spr: [sprId.AXE],
+  rotation: [0, 0],
+  flip: 0,
+  hitEnemy: function() {
+    for (var i = 0; i < level.sacrifices.length; i++) {
+      var sacrifice = level.sacrifices[i];
+      var xDiff = (sacrifice.x + 100) / (axe.x + 100);
+      var yDiff = (sacrifice.y + 100) / (axe.y + 100);
+      if (xDiff >= 0.95 && xDiff <= 1.05 && yDiff >= 0.95 && yDiff <= 1.05) {
+        hurtSacrifice(i, 100);
+      }
+    }
+    sfx(10, 'E-5', -1, 1, 15, 0); // swing axe sfx
+  },
+  cooldown: 0
 };
 
 function drawTitleScreen() {
-	cls(0);
+  cls(0);
 
-	if (btnp(4)) {
-		player.reset();
-		game.state = game.story;
-		sfx(11, 'C-7', -1, 1, 15, 0);
-	}
-	if (btnp(5)) {
-		game.state = game.play;
-		sfx(11, 'C-7', -1, 1, 15, 0);
-	}
+  if (btnp(4)) {
+    player.reset();
+    game.state = game.story;
+    sfx(11, 'C-7', -1, 1, 15, 0);
+  }
+  if (btnp(5)) {
+    game.state = game.play;
+    sfx(11, 'C-7', -1, 1, 15, 0);
+  }
 
-	map(210, 120, 60, 60, 60, 10, 7, 2, null);
+  map(210, 120, 60, 60, 60, 10, 7, 2, null);
 
-	print('press [A] to start', 76, 114);
-	print('press [B] to skip intro', 66, 124);
+  print('press [A] to start', 76, 114);
+  print('press [B] to skip intro', 66, 124);
 }
 
 const gameOverTimer = 60;
 function drawGameOverScreen() {
-	cls();
+  cls();
 
-	if (btnp(4) && gameOverTimer <= 0) {
-		init();
-		game.state = game.play;
-	} else if (btnp(5) && gameOverTimer <= 0) {
-		init();
-		game.state = game.title;
-	} else gameOverTimer--;
+  if (btnp(4) && gameOverTimer <= 0) {
+    init();
+    game.state = game.play;
+  } else if (btnp(5) && gameOverTimer <= 0) {
+    init();
+    game.state = game.title;
+  } else gameOverTimer--;
 
-	print('YOU FAILED TO CLAIM THE THRONE', 42, 45);
-	print('press [A] to try again', 68, 65);
-	print('press [B] to give up', 75, 85);
+  print('YOU FAILED TO CLAIM THE THRONE', 42, 45);
+  print('press [A] to try again', 68, 65);
+  print('press [B] to give up', 75, 85);
 }
 
 function drawStory() {
-	cls();
+  cls();
 
-	if (gameState.storyTimer > 600) {
-		print('Bastard of man and bull, you have been', 16, 10);
-		print('exiled to a remote labyrinth in Crete.', 20, 20);
-		print('A freak, a menace, an outcast.', 40, 40);
-		print('But while your appearance may seem bestial,', 4, 60);
-		print('your heart...', 86, 70);
-		print('is human...', 176, 120);
-		gameState.storyTimer--;
-	} else {
-		print('But the Gods have shown mercy, giving you', 12, 10);
-		print('the chance to reclaim your humanity', 27, 20);
-		print('by consuming the sacrifices and heroes', 18, 30);
-		print('tossed before you.', 68, 40);
-		print('Even more, as your power grows, you', 28, 60);
-		print('may one day come to rule over those', 27, 70);
-		print('who made you an outcast...', 56, 80);
+  if (gameState.storyTimer > 600) {
+    print('Bastard of man and bull, you have been', 16, 10);
+    print('exiled to a remote labyrinth in Crete.', 20, 20);
+    print('A freak, a menace, an outcast.', 40, 40);
+    print('But while your appearance may seem bestial,', 4, 60);
+    print('your heart...', 86, 70);
+    print('is human...', 176, 120);
+    gameState.storyTimer--;
+  } else {
+    print('But the Gods have shown mercy, giving you', 12, 10);
+    print('the chance to reclaim your humanity', 27, 20);
+    print('by consuming the sacrifices and heroes', 18, 30);
+    print('tossed before you.', 68, 40);
+    print('Even more, as your power grows, you', 28, 60);
+    print('may one day come to rule over those', 27, 70);
+    print('who made you an outcast...', 56, 80);
 
-		print('press [A] to start', 76, 114);
+    print('press [A] to start', 76, 114);
 
-		if (btnp(4)) {
-			game.state = game.play;
-		}
-	}
+    if (btnp(4)) {
+      game.state = game.play;
+    }
+  }
 }
 
 const winTimer = 60;
 function drawGameWinScreen() {
-	cls(0);
+  cls(0);
 
-	if (btnp(4) && winTimer <= 0) {
-		isFirstRun = true;
-		game.state = game.title;
-	} else winTimer--;
+  if (btnp(4) && winTimer <= 0) {
+    isFirstRun = true;
+    game.state = game.title;
+  } else winTimer--;
 
-	print('THANK YOU FOR PLAYING', 65, 4);
+  print('THANK YOU FOR PLAYING', 65, 4);
 
-	map(210, 120, 60, 60, 60, 15, 7, 2, null);
+  map(210, 120, 60, 60, 60, 15, 7, 2, null);
 
-	print('YOU HAVE CONSUMED THE NECESSARY SACRIFICES', 3, 118);
-	print('press [A] to play again.', 63, 128);
+  print('YOU HAVE CONSUMED THE NECESSARY SACRIFICES', 3, 118);
+  print('press [A] to play again.', 63, 128);
 }
 
 function updatePlayer() {
-	player.stop();
-	player.move();
-	player.attack();
+  player.stop();
+  player.move();
+  player.attack();
 }
 
 function updateWinCondition() {
-	waveTimer.tick(level.difficulty);
-	if (waveTimer.remaining > 0 && level.sacrifices.length <= 0) {
-		init();
-		game.state = game.win;
-	} else if (waveTimer.remaining <= 0) {
-		init();
-		game.state = game.gameOver;
-	}
+  waveTimer.tick(level.difficulty);
+  if (waveTimer.remaining > 0 && level.sacrifices.length <= 0) {
+    init();
+    game.state = game.win;
+  } else if (waveTimer.remaining <= 0) {
+    init();
+    game.state = game.gameOver;
+  }
 }
 
 function updateSacs() {
-	var person = void 0;
+  var person = void 0;
 
-	for (var i = 0, len = level.sacrifices.length; i < len; i++) {
-		person = level.sacrifices[i];
-		person.stop();
-		person.move();
+  for (var i = 0, len = level.sacrifices.length; i < len; i++) {
+    person = level.sacrifices[i];
+    person.stop();
+    person.move();
 
-		spr(person.spr + i, person.x, person.y, 0);
-	}
+    spr(person.spr + i, person.x, person.y, 0);
+  }
 }
 
 function drawPlayer() {
-	spr(player.spr, player.x, player.y, 0);
+  spr(player.spr, player.x, player.y, 0);
 }
 
 function drawUI() {
-	print('TIME:', 164, 0, 1);
-	for (i = 0; i < waveTimer.remaining / 75; i++) {
-		rect(192 + i, 0, 1, 5, 1);
-	}
+  print('TIME:', 164, 0, 1);
+  for (i = 0; i < waveTimer.remaining / 75; i++) {
+    rect(192 + i, 0, 1, 5, 1);
+  }
 
-	print('SACRIFICES: ' + level.sacrifices.length, 60, 0, 1);
-	print('LVL: ' + (level.map.id + 1), 0, 0, 1);
+  print('SACRIFICES: ' + level.sacrifices.length, 60, 0, 1);
+  print('LVL: ' + (level.map.id + 1), 0, 0, 1);
 }
 
 function playMusic(trackNumber) {
-	// tracks are numbered 0-7
-	if (currentMusicTrack != trackNumber) {
-		music(trackNumber);
-		currentMusicTrack = trackNumber;
-	}
+  // tracks are numbered 0-7
+  if (currentMusicTrack != trackNumber) {
+    music(trackNumber);
+    currentMusicTrack = trackNumber;
+  }
 }
 
 // <TILES>

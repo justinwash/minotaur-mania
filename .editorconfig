@@ -9,6 +9,7 @@ charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 max_line_length = 120
+use_single_quote = true
 
 # Use 4 spaces for the Python files
 [*.py]
