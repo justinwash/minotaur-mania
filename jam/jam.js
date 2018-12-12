@@ -3,7 +3,7 @@
 // desc:   sacrifices must be made
 // script: js
 
-const sprId = {
+const sprites = {
 	PLAYER    : 256,
 	AXE       : 272,
 	SACRIFICE : 257
@@ -30,12 +30,112 @@ const spawnLocation = [
 	{ x: 180, y: 106, used: false }
 ];
 
+// const axe = {
+// 	x        : 0,
+// 	y        : 0,
+// 	spr      : [ sprites.AXE ],
+// 	rotation : [ 0, 0 ],
+// 	flip     : 0,
+// 	hitEnemy : function() {
+// 		for (var i = 0; i < sacrifices.length; i++) {
+// 			var sacrifice = sacrifices[i];
+// 			var xDiff = (sacrifice.x + 100) / (axe.x + 100);
+// 			var yDiff = (sacrifice.y + 100) / (axe.y + 100);
+// 			if (xDiff >= 0.95 && xDiff <= 1.05 && yDiff >= 0.95 && yDiff <= 1.05) {
+// 				hurtSacrifice(i, 100);
+// 			}
+// 		}
+// 	},
+// 	cooldown : 0
+// };
+
+//ABILITIES------------------------------------------------------
+function ability(x, y, spr, rotation, flip, cooldown, action) {
+	this.x = x || 0;
+	this.y = y || 0;
+	this.spr = spr || 0;
+	this.rotation = rotation || 0;
+	this.flip = flip || 0;
+	this.cooldown = cooldown || 0;
+
+	this.action = action || function () { }
+}
+
+var axe = new ability(0, 
+	0, 
+	[sprites.AXE], 
+	[0, 0], 
+	0,
+	0,
+	function () {
+		if (player.facing == 'r') {
+			this.x = player.x + 4;
+			this.y = player.y - 1;
+			this.flip = 0;
+			this.rotation = [ 0, 1 ];
+		}
+
+		if (player.facing == 'l') {
+			this.x = player.x - 6;
+			this.y = player.y - 1;
+			this.flip = 1;
+			this.rotation = [ 0, 1 ];
+		}
+
+		if (player.facing == 'u') {
+			this.x = player.x - 1;
+			this.y = player.y - 6;
+			this.flip = 3;
+			this.rotation = [ 1, 2 ];
+		}
+
+		if (player.facing == 'd') {
+			this.x = player.x - 1;
+			this.y = player.y + 4;
+			this.flip = 4;
+			this.rotation = [ 1, 2 ];
+		}
+
+		if (btnp(4) && this.cooldown <= 0) {
+			
+			//hit enemy
+			for (var i = 0; i < sacrifices.length; i++) {
+				var sacrifice = sacrifices[i];
+				var xDiff = (sacrifice.x + 100) / (this.x + 100);
+				var yDiff = (sacrifice.y + 100) / (this.y + 100);
+				if (xDiff >= 0.95 && xDiff <= 1.05 && yDiff >= 0.95 && yDiff <= 1.05) {
+					hurtSacrifice(i, 100);
+				}
+			}
+			
+			//after hit enemy
+			this.cooldown = 30;
+			spr(this.spr, this.x, this.y, 0, 1, this.flip, this.rotation[0]);
+		} else if (this.cooldown > 15) {
+			this.cooldown--;
+			spr(this.spr, this.x, this.y, 0, 1, this.flip, this.rotation[0]);
+		} else if (this.cooldown > 0) {
+			this.cooldown--;
+			spr(this.spr, this.x, this.y, 0, 1, this.flip, this.rotation[1]);
+		}
+
+	});
+
+
+var abilities = [ //make new abilities and add them here!
+	axe
+];
+
+var selectedAbility = 0; //index of abilities array
+//ABILITIES------------------------------------------------------
+
+
 const sacrifices = [];
 
 const currentMusicTrack = -1;
 
 function sacrifice() {
-	(this.x = 0), (this.y = 0), (this.dx = 0), (this.dy = 0), (this.spr = sprId.SACRIFICE), (this.health = 100), (this.speed = 0.25);
+	(this.x = 0), (this.y = 0), (this.dx = 0), (this.dy = 0), (this.spr = sprites.SACRIFICE), (this.health = 100), (this.speed = 0.25);
 	this.directions = [ 'u', 'd', 'l', 'r' ];
 	this.randDirIndex = Math.floor(Math.random() * this.directions.length);
 	this.directionSwitchTimer = 30;
@@ -174,7 +274,7 @@ const player = {
 	dx         : 0,
 	dy         : 0,
 	facing     : 'r',
-	spr        : sprId.PLAYER,
+	spr        : sprites.PLAYER,
 	health     : 100,
 	attacking  : false,
 	speed      : 1,
@@ -238,65 +338,8 @@ const player = {
 		}
 	},
 	attack() {
-		if (player.facing == 'r') {
-			axe.x = player.x + 4;
-			axe.y = player.y - 1;
-			axe.flip = 0;
-			axe.rotation = [ 0, 1 ];
-		}
-
-		if (player.facing == 'l') {
-			axe.x = player.x - 6;
-			axe.y = player.y - 1;
-			axe.flip = 1;
-			axe.rotation = [ 0, 1 ];
-		}
-
-		if (player.facing == 'u') {
-			axe.x = player.x - 1;
-			axe.y = player.y - 6;
-			axe.flip = 3;
-			axe.rotation = [ 1, 2 ];
-		}
-
-		if (player.facing == 'd') {
-			axe.x = player.x - 1;
-			axe.y = player.y + 4;
-			axe.flip = 4;
-			axe.rotation = [ 1, 2 ];
-		}
-
-		if (btnp(4) && axe.cooldown <= 0) {
-			axe.hitEnemy();
-			axe.cooldown = 30;
-			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[0]);
-		} else if (axe.cooldown > 15) {
-			axe.cooldown--;
-			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[0]);
-		} else if (axe.cooldown > 0) {
-			axe.cooldown--;
-			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[1]);
-		}
+		abilities[selectedAbility].action();
 	}
-};
-
-const axe = {
-	x        : 0,
-	y        : 0,
-	spr      : [ sprId.AXE ],
-	rotation : [ 0, 0 ],
-	flip     : 0,
-	hitEnemy : function() {
-		for (var i = 0; i < sacrifices.length; i++) {
-			var sacrifice = sacrifices[i];
-			var xDiff = (sacrifice.x + 100) / (axe.x + 100);
-			var yDiff = (sacrifice.y + 100) / (axe.y + 100);
-			if (xDiff >= 0.95 && xDiff <= 1.05 && yDiff >= 0.95 && yDiff <= 1.05) {
-				hurtSacrifice(i, 100);
-			}
-		}
-	},
-	cooldown : 0
 };
 
 function drawTitleScreen() {
