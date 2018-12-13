@@ -48,16 +48,19 @@ function Game() {
     updateSacs();
     drawUI();
     updatePlayer();
-    drawPlayer();
+    player.draw();
     updateWinCondition();
   };
 }
+
+const p1Buttons = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
 const isFirstRun = true;
 const level = null;
 const currentMusicTrack = -1;
 const game = new Game();
-const move = new MovementController();
+const player = new Player(256, 8, 16, p1Buttons);
+const mover = new MovementController();
 
 const waveTimer = {
   remaining: 3600, //60sec at 60fps
@@ -251,19 +254,19 @@ function MovementController() {
   this.moveEntity = function(entity, directions) {
     var availableDirections = this.checkCollision(entity);
     if (directions.indexOf('u') > -1 && availableDirections.indexOf('u') > -1) {
-      entity.dy -= 0.5;
+      entity.dy -= entity.speed;
       entity.facing = 'u';
     }
     if (directions.indexOf('d') > -1 && availableDirections.indexOf('d') > -1) {
-      entity.dy += 0.5;
+      entity.dy += entity.speed;
       entity.facing = 'd';
     }
     if (directions.indexOf('l') > -1 && availableDirections.indexOf('l') > -1) {
-      entity.dx -= 0.5;
+      entity.dx -= entity.speed;
       entity.facing = 'l';
     }
     if (directions.indexOf('r') > -1 && availableDirections.indexOf('r') > -1) {
-      entity.dx += 0.5;
+      entity.dx += entity.speed;
       entity.facing = 'r';
     }
 
@@ -285,20 +288,24 @@ function hurtSacrifice(index, dmg) {
   sfx(11, 'C-7', -1, 2, 15, 0); // hurt sacrifice sfx
 }
 
-const player = {
-  x: 8,
-  y: 16,
-  dx: 0,
-  dy: 0,
-  w: 6,
-  h: 6,
-  facing: 'r',
-  spr: sprId.PLAYER,
-  health: 100,
-  attacking: false,
-  speed: 1,
-  halted: false,
-  reset: function() {
+function Player(sprite, startx, starty, buttons) {
+  this.x = startx;
+  this.y = starty;
+  this.buttons = buttons;
+  this.dx = 0;
+  this.dy = 0;
+  this.w = 6;
+  this.h = 6;
+  this.facing = 'r';
+  this.spr = sprite;
+  this.health = 100;
+  this.attacking = false;
+  this.speed = 0.5;
+  this.halted = false;
+  this.draw = function() {
+    spr(this.spr, this.x, this.y, 0);
+  };
+  this.reset = function() {
     this.x = 8;
     this.y = 16;
     this.dx = 0;
@@ -306,8 +313,8 @@ const player = {
     this.health = 100;
     this.attacking = false;
     this.halted = false;
-  },
-  move: function() {
+  };
+  this.move = function() {
     if (!this.halted) {
       var pressedDirections = [];
       if (btn(0)) {
@@ -323,14 +330,14 @@ const player = {
         pressedDirections.push('r');
       }
 
-      move.moveEntity(this, pressedDirections);
+      mover.moveEntity(this, pressedDirections);
     }
-  },
-  stop: function() {
+  };
+  this.stop = function() {
     this.dx = 0;
     this.dy = 0;
-  },
-  attack() {
+  };
+  this.attack = function() {
     if (player.facing == 'r') {
       axe.x = player.x + 4;
       axe.y = player.y - 1;
@@ -370,8 +377,8 @@ const player = {
       axe.cooldown--;
       spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[1]);
     }
-  }
-};
+  };
+}
 
 const axe = {
   x: 0,
@@ -501,10 +508,6 @@ function updateSacs() {
 
     spr(person.spr + i, person.x, person.y, 0);
   }
-}
-
-function drawPlayer() {
-  spr(player.spr, player.x, player.y, 0);
 }
 
 function drawUI() {
