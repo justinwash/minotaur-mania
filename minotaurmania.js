@@ -336,6 +336,7 @@ function Player(sprite, startx, starty, buttons) {
   this.draw = function () {
     spr(this.spr, this.x, this.y, 0);
   };
+
   this.reset = function () {
     this.x = 8;
     this.y = 16;
