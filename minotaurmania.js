@@ -3,591 +3,516 @@
 // desc:   sacrifices must be made
 // script: js
 
-const sprId = {
-	PLAYER    : 256,
-	AXE       : 272,
-	SACRIFICE : 257
-};
+function Game() {
+  this.state = function () { };
 
-const gameState = {
-	title          : true,
-	story          : false,
-	storyTimer     : 1200,
-	gameStart      : false,
-	gameWin        : false,
-	gameStartTimer : 120,
-	play           : true,
-	difficulty     : 1,
-	waveCleared    : false,
-	gameOver       : false
-};
+  this.title = function () {
+    playMusic(1);
+    drawTitleScreen();
+  };
+  this.story = function () {
+    drawStory();
+  };
+  this.gameOver = function () {
+    playMusic(0);
+    drawGameOverScreen();
+  };
+  this.win = function () {
+    drawGameWinScreen();
+  };
+  this.play = function () {
+    playMusic(0);
+    cls();
+    level.drawMap();
+    updateSacrifices();
+    drawUI();
+    updatePlayer();
+    player.draw();
+    updateWinCondition();
+  };
+}
 
-const spawnLocation = [
-	{ x: 210, y: 60, used: false },
-	{ x: 50, y: 50, used: false },
-	{ x: 75, y: 75, used: false },
-	{ x: 200, y: 124, used: false },
-	{ x: 180, y: 106, used: false }
-];
+const axe = new Weapon( //weapons must be initialized before the player
+  272,
+  100,
+  function () {
+    for (var i = 0; i < level.sacrifices.length; i++) {
+      var sacrifice = level.sacrifices[i];
+      if (this.didHitSacrifice(sacrifice)) {
+        this.hurtSacrifice(i, 100);
+      }
+    }
+    sfx(10, 'E-5', -1, 1, 15, 0); // swing axe sfx
+  });
 
-const sacrifices = [];
-
+const isFirstRun = true;
+const level = null;
 const currentMusicTrack = -1;
-
-function sacrifice() {
-	(this.x = 0), (this.y = 0), (this.dx = 0), (this.dy = 0), (this.spr = sprId.SACRIFICE), (this.health = 100), (this.speed = 0.25);
-	this.directions = [ 'u', 'd', 'l', 'r' ];
-	this.randDirIndex = Math.floor(Math.random() * this.directions.length);
-	this.directionSwitchTimer = 30;
-	this.spawn = function() {
-		var index = Math.floor(Math.random() * spawnLocation.length);
-		var notAllUsed = false;
-
-		if (spawnLocation[index].used === true) {
-			//already been used
-			//check if any remain unused. If so, recurse. Else, don't spawn.
-
-			for (var i = 0, len = spawnLocation.length; i < len; i++) {
-				if (spawnLocation[i].used === false) {
-					notAllUsed = true;
-				}
-			}
-
-			if (notAllUsed) {
-				this.spawn(); //if some locations are not used, then try to spawn again
-			}
-		} else {
-			this.x = spawnLocation[index].x;
-			this.y = spawnLocation[index].y;
-			spawnLocation[index].used = true;
-		}
-	};
-
-	this.move = function() {
-		if (this.directionSwitchTimer <= 0) {
-			this.directionSwitchTimer = 10;
-			while (!this.canMoveDir(this.directions[this.randDirIndex])) {
-				this.randDirIndex = Math.floor(Math.random() * this.directions.length);
-			}
-		} else {
-			this.directionSwitchTimer--;
-		}
-
-		if (!this.halted) {
-			if (this.canMoveDir('u')) {
-				if (this.directions[this.randDirIndex] === 'u') {
-					this.dy -= this.speed * gameState.difficulty;
-					this.facing = 'u';
-				}
-			}
-			if (this.canMoveDir('d')) {
-				if (this.directions[this.randDirIndex] === 'd') {
-					this.dy += this.speed * gameState.difficulty;
-					this.facing = 'd';
-				}
-			}
-			if (this.canMoveDir('l')) {
-				if (this.directions[this.randDirIndex] === 'l') {
-					this.dx -= this.speed * gameState.difficulty;
-					this.facing = 'l';
-				}
-			}
-			if (this.canMoveDir('r')) {
-				if (this.directions[this.randDirIndex] === 'r') {
-					this.dx += this.speed * gameState.difficulty;
-					this.facing = 'r';
-				}
-			}
-
-			this.x += this.dx;
-			this.y += this.dy;
-		}
-	};
-
-	this.stop = function() {
-		this.dx = 0;
-		this.dy = 0;
-	};
-
-	this.canMoveDir = function(direction) {
-		if (direction == 'l') {
-			if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 3) == 0) return true;
-		}
-		if (direction == 'r') {
-			if (pix(this.x + 4, this.y) == 0 && pix(this.x + 4, this.y + 3) == 0) return true;
-		}
-		if (direction == 'u') {
-			if (pix(this.x, this.y - 1) == 0 && pix(this.x + 3, this.y - 1) == 0) return true;
-		}
-		if (direction == 'd') {
-			if (pix(this.x, this.y + 4) == 0 && pix(this.x + 3, this.y + 4) == 0) return true;
-		}
-	};
-
-	this.spawn();
-}
-
-function populateSacrifices() {
-	var person = void 0;
-
-	for (var i = 0; i < spawnLocation.length; i++) {
-		person = new sacrifice();
-		sacrifices.push(person);
-	}
-}
-
-function hurtSacrifice(index, dmg) {
-	var enemy = sacrifices[index];
-	enemy.health -= dmg;
-	if (enemy.health <= 0) {
-		sacrifices.splice(index, 1);
-	}
-}
+const game = new Game();
+const player = new Player(256, 8, 16, [0, 1, 2, 3, 4, 5, 6, 7, 8]);
+const mover = new MovementController();
 
 const waveTimer = {
-	remaining : 3600, //60sec at 60fps
-	tick      : function(rate) {
-		this.remaining = this.remaining - rate;
-	}
+  remaining: 3600, //60sec at 60fps
+  tick: function (rate) {
+    this.remaining = this.remaining - rate;
+  }
 };
 
-function canMove(direction) {
-	//make sure you bind ;)
-
-	if (direction == 'l') {
-		if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 5) == 0) return true;
-	}
-	if (direction == 'r') {
-		if (pix(this.x + 6, this.y) == 0 && pix(this.x + 6, this.y + 5) == 0) return true;
-	}
-	if (direction == 'u') {
-		if (pix(this.x, this.y - 1) == 0 && pix(this.x + 5, this.y - 1) == 0) return true;
-	}
-	if (direction == 'd') {
-		if (pix(this.x, this.y + 6) == 0 && pix(this.x + 5, this.y + 6) == 0) return true;
-	}
+function TIC() {
+  if (isFirstRun) init();
+  game.state();
 }
 
-const player = {
-	x          : 8,
-	y          : 16,
-	dx         : 0,
-	dy         : 0,
-	facing     : 'r',
-	spr        : sprId.PLAYER,
-	health     : 100,
-	attacking  : false,
-	speed      : 1,
-	halted     : false,
-	reset      : function() {
-		this.x = 8;
-		this.y = 16;
-		this.dx = 0;
-		this.dy = 0;
-		this.health = 100;
-		this.attacking = false;
-		this.halted = false;
-	},
-	move       : function() {
-		if (!this.halted) {
-			if (this.canMoveDir('u')) {
-				if (btn(0)) {
-					this.dy -= 0.5;
-					this.facing = 'u';
-				}
-			}
-			if (this.canMoveDir('d')) {
-				if (btn(1)) {
-					this.dy += 0.5;
-					this.facing = 'd';
-				}
-			}
-			if (this.canMoveDir('l')) {
-				if (btn(2)) {
-					this.dx -= 0.5;
-					this.facing = 'l';
-				}
-			}
-			if (this.canMoveDir('r')) {
-				if (btn(3)) {
-					this.dx += 0.5;
-					this.facing = 'r';
-				}
-			}
+function init() {
+  game.state = game.title;
+  level = new Level(0, 1);
+  waveTimer.remaining = 3600;
+  player.x = level.map.start.x;
+  player.y = level.map.start.y;
+  isFirstRun = false;
+}
 
-			this.x += this.dx;
-			this.y += this.dy;
-		}
-	},
-	stop       : function() {
-		this.dx = 0;
-		this.dy = 0;
-	},
-	canMoveDir(direction) {
-		if (direction == 'l') {
-			if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 5) == 0) return true;
-		}
-		if (direction == 'r') {
-			if (pix(this.x + 6, this.y) == 0 && pix(this.x + 6, this.y + 5) == 0) return true;
-		}
-		if (direction == 'u') {
-			if (pix(this.x, this.y - 1) == 0 && pix(this.x + 5, this.y - 1) == 0) return true;
-		}
-		if (direction == 'd') {
-			if (pix(this.x, this.y + 6) == 0 && pix(this.x + 5, this.y + 6) == 0) return true;
-		}
-	},
-	attack() {
-		if (player.facing == 'r') {
-			axe.x = player.x + 4;
-			axe.y = player.y - 1;
-			axe.flip = 0;
-			axe.rotation = [ 0, 1 ];
-		}
+function Level(id, difficulty) {
+  this.maps = [
+    {
+      id: 0,
+      x: 0,
+      y: 0,
+      start: {
+        x: 12,
+        y: 16
+      },
+      spawns: [
+        { x: 210, y: 60, used: false },
+        { x: 50, y: 50, used: false },
+        { x: 75, y: 75, used: false },
+        { x: 200, y: 124, used: false },
+        { x: 180, y: 106, used: false }
+      ]
+    },
+    {
+      id: 1,
+      x: 0,
+      y: 0,
+      start: {
+        x: 12,
+        y: 16
+      },
+      spawns: [
+        { x: 210, y: 60, used: false },
+        { x: 50, y: 50, used: false },
+        { x: 75, y: 75, used: false },
+        { x: 200, y: 124, used: false },
+        { x: 180, y: 106, used: false }
+      ]
+    }
+  ];
 
-		if (player.facing == 'l') {
-			axe.x = player.x - 6;
-			axe.y = player.y - 1;
-			axe.flip = 1;
-			axe.rotation = [ 0, 1 ];
-		}
+  this.drawMap = function () {
+    map(this.map.x, this.map.y, 30, 17, 0, 0, -1, 1, null);
+  };
 
-		if (player.facing == 'u') {
-			axe.x = player.x - 1;
-			axe.y = player.y - 6;
-			axe.flip = 3;
-			axe.rotation = [ 1, 2 ];
-		}
+  this.sacrifices = [];
 
-		if (player.facing == 'd') {
-			axe.x = player.x - 1;
-			axe.y = player.y + 4;
-			axe.flip = 4;
-			axe.rotation = [ 1, 2 ];
-		}
+  this.populateSacrifices = function () {
+    var sacrifice = void 0;
 
-		if (btnp(4) && axe.cooldown <= 0) {
-			axe.hitEnemy();
-			axe.cooldown = 30;
-			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[0]);
-		} else if (axe.cooldown > 15) {
-			axe.cooldown--;
-			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[0]);
-		} else if (axe.cooldown > 0) {
-			axe.cooldown--;
-			spr(axe.spr, axe.x, axe.y, 0, 1, axe.flip, axe.rotation[1]);
-		}
-	}
+    for (var i = 0; i < this.map.spawns.length; i++) {
+      sacrifice = new Sacrifice();
+      sacrifice.spawn(this.map.spawns);
+      this.sacrifices.push(sacrifice);
+    }
+  };
+
+  this.map = this.maps[id];
+  this.difficulty = difficulty;
+
+  this.populateSacrifices();
+}
+
+function Sacrifice() {
+  this.x = 0;
+  this.y = 0;
+  this.dx = 0;
+  this.dy = 0;
+  this.w = 4;
+  this.h = 4;
+  this.spr = 257;
+  this.health = 100;
+  this.speed = 0.25;
+  this.directions = ['u', 'd', 'l', 'r'];
+  this.randDirIndex = Math.floor(Math.random() * this.directions.length);
+  this.directionSwitchTimer = 30;
+  this.spawn = function (spawns) {
+    var index = Math.floor(Math.random() * spawns.length);
+    var notAllUsed = false;
+
+    if (spawns[index].used === true) {
+      for (i = 0; i < spawns.length; i++) {
+        if (spawns[i].used === false) {
+          notAllUsed = true;
+        }
+      }
+
+      if (notAllUsed) {
+        this.spawn(spawns);
+      }
+    } else {
+      this.x = spawns[index].x;
+      this.y = spawns[index].y;
+      spawns[index].used = true;
+    }
+  };
+
+  this.move = function () {
+    if (this.directionSwitchTimer <= 0) {
+      this.directionSwitchTimer = 10;
+      while (!this.canMoveDir(this.directions[this.randDirIndex])) {
+        this.randDirIndex = Math.floor(Math.random() * this.directions.length);
+      }
+    } else {
+      this.directionSwitchTimer--;
+    }
+
+    if (!this.halted) {
+      var chosenDirections = [];
+      if (this.directions[this.randDirIndex] == 'u') {
+        chosenDirections.push('u');
+      }
+      if (this.directions[this.randDirIndex] == 'd') {
+        chosenDirections.push('d');
+      }
+      if (this.directions[this.randDirIndex] == 'l') {
+        chosenDirections.push('l');
+      }
+      if (this.directions[this.randDirIndex] == 'r') {
+        chosenDirections.push('r');
+      }
+
+      mover.moveEntity(this, chosenDirections);
+    }
+  };
+
+  this.stop = function () {
+    this.dx = 0;
+    this.dy = 0;
+  };
+
+  this.canMoveDir = function (direction) {
+    if (direction == 'l') {
+      if (pix(this.x - 1, this.y) == 0 && pix(this.x - 1, this.y + 3) == 0) return true;
+    }
+    if (direction == 'r') {
+      if (pix(this.x + 4, this.y) == 0 && pix(this.x + 4, this.y + 3) == 0) return true;
+    }
+    if (direction == 'u') {
+      if (pix(this.x, this.y - 1) == 0 && pix(this.x + 3, this.y - 1) == 0) return true;
+    }
+    if (direction == 'd') {
+      if (pix(this.x, this.y + 4) == 0 && pix(this.x + 3, this.y + 4) == 0) return true;
+    }
+  };
+}
+
+function MovementController() {
+  this.checkCollision = function (entity) {
+    var availableDirections = [];
+
+    if (pix(entity.x - 1, entity.y) == 0 && pix(entity.x - 1, entity.y + entity.h - 1) == 0)
+      availableDirections.push('l');
+    if (pix(entity.x + entity.w, entity.y) == 0 && pix(entity.x + entity.w - 1, entity.y + entity.h - 1) == 0)
+      availableDirections.push('r');
+    if (pix(entity.x, entity.y - 1) == 0 && pix(entity.x + entity.w - 1, entity.y - 1) == 0)
+      availableDirections.push('u');
+    if (pix(entity.x, entity.y + entity.h) == 0 && pix(entity.x + entity.w - 1, entity.y + entity.h) == 0)
+      availableDirections.push('d');
+
+    return availableDirections;
+  };
+
+  this.moveEntity = function (entity, directions) {
+    var availableDirections = this.checkCollision(entity);
+    if (directions.indexOf('u') > -1 && availableDirections.indexOf('u') > -1) {
+      entity.dy -= entity.speed;
+      entity.facing = 'u';
+    }
+    if (directions.indexOf('d') > -1 && availableDirections.indexOf('d') > -1) {
+      entity.dy += entity.speed;
+      entity.facing = 'd';
+    }
+    if (directions.indexOf('l') > -1 && availableDirections.indexOf('l') > -1) {
+      entity.dx -= entity.speed;
+      entity.facing = 'l';
+    }
+    if (directions.indexOf('r') > -1 && availableDirections.indexOf('r') > -1) {
+      entity.dx += entity.speed;
+      entity.facing = 'r';
+    }
+
+    entity.x += entity.dx;
+    entity.y += entity.dy;
+  };
+}
+
+function Weapon(sprite, strength, attackFunction) {
+  this.x = 0;
+  this.y = 0;
+  this.spr = sprite;
+  this.rotation = [0, 0];
+  this.flip = 0;
+  this.cooldown = 0;
+  this.strength = strength;
+  this.attack = attackFunction;
+
+  this.orient = function () {
+    if (player.facing == 'r') {
+      this.x = player.x + 4;
+      this.y = player.y - 1;
+      this.flip = 0;
+      this.rotation = [0, 1];
+    }
+
+    if (player.facing == 'l') {
+      this.x = player.x - 6;
+      this.y = player.y - 1;
+      this.flip = 1;
+      this.rotation = [0, 1];
+    }
+
+    if (player.facing == 'u') {
+      this.x = player.x - 1;
+      this.y = player.y - 6;
+      this.flip = 3;
+      this.rotation = [1, 2];
+    }
+
+    if (player.facing == 'd') {
+      this.x = player.x - 1;
+      this.y = player.y + 4;
+      this.flip = 4;
+      this.rotation = [1, 2];
+    }
+  };
+
+  this.hurtSacrifice = function (index) {
+    var enemy = level.sacrifices[index];
+    enemy.health -= this.strength;
+    if (enemy.health <= 0) {
+      waveTimer.remaining += 200;
+      if (waveTimer.remaining >= 3600) {
+        waveTimer.remaining = 3600;
+      }
+      level.sacrifices.splice(index, 1);
+    }
+    sfx(11, 'C-7', -1, 2, 15, 0); // hurt sacrifice sfx
+  };
+
+  this.didHitSacrifice = function (sacrifice) {
+    var xDiff = (sacrifice.x + 100) / (this.x + 100);
+    var yDiff = (sacrifice.y + 100) / (this.y + 100);
+    if (xDiff >= 0.95 && xDiff <= 1.05 && yDiff >= 0.95 && yDiff <= 1.05) {
+      return true;
+    } else return false;
+  };
 };
 
-const axe = {
-	x        : 0,
-	y        : 0,
-	spr      : [ sprId.AXE ],
-	rotation : [ 0, 0 ],
-	flip     : 0,
-	hitEnemy : function() {
-		for (var i = 0; i < sacrifices.length; i++) {
-			var sacrifice = sacrifices[i];
-			var xDiff = (sacrifice.x + 100) / (axe.x + 100);
-			var yDiff = (sacrifice.y + 100) / (axe.y + 100);
-			if (xDiff >= 0.95 && xDiff <= 1.05 && yDiff >= 0.95 && yDiff <= 1.05) {
-				hurtSacrifice(i, 100);
-			}
-		}
-	},
-	cooldown : 0
-};
+function Player(sprite, startx, starty, buttons) {
+  this.x = startx;
+  this.y = starty;
+  this.buttons = buttons;
+  this.dx = 0;
+  this.dy = 0;
+  this.w = 6;
+  this.h = 6;
+  this.facing = 'r';
+  this.spr = sprite;
+  this.health = 100;
+  this.attacking = false;
+  this.speed = 0.5;
+  this.halted = false;
+  this.weapon = axe;
+  this.draw = function () {
+    spr(this.spr, this.x, this.y, 0);
+  };
+  this.reset = function () {
+    this.x = 8;
+    this.y = 16;
+    this.dx = 0;
+    this.dy = 0;
+    this.health = 100;
+    this.attacking = false;
+    this.halted = false;
+  };
+  this.move = function () {
+    if (!this.halted) {
+      var pressedDirections = [];
+      if (btn(0)) {
+        pressedDirections.push('u');
+      }
+      if (btn(1)) {
+        pressedDirections.push('d');
+      }
+      if (btn(2)) {
+        pressedDirections.push('l');
+      }
+      if (btn(3)) {
+        pressedDirections.push('r');
+      }
+
+      mover.moveEntity(this, pressedDirections);
+    }
+  };
+
+  this.stop = function () {
+    this.dx = 0;
+    this.dy = 0;
+  };
+
+  this.attack = function () {
+    this.weapon.orient();
+
+    if (btnp(4) && this.weapon.cooldown <= 0) {
+      this.weapon.attack();
+      this.weapon.cooldown = 30;
+      spr(this.weapon.spr, this.weapon.x, this.weapon.y, 0, 1, this.weapon.flip, this.weapon.rotation[0]);
+    } else if (this.weapon.cooldown > 15) {
+      this.weapon.cooldown--;
+      spr(this.weapon.spr, this.weapon.x, this.weapon.y, 0, 1, this.weapon.flip, this.weapon.rotation[0]);
+    } else if (this.weapon.cooldown > 0) {
+      this.weapon.cooldown--;
+      spr(this.weapon.spr, this.weapon.x, this.weapon.y, 0, 1, this.weapon.flip, this.weapon.rotation[1]);
+    }
+  };
+}
 
 function drawTitleScreen() {
-	cls(0);
-	playMusic(1);
-	waveTimer.remaining = 3600;
+  cls(0);
 
-	if (btnp(4)) {
-		gameState.story = true;
-		gameState.gameStart = false;
-		player.reset();
-	}
-	if (btnp(5)) {
-		gameState.story = false;
-		gameState.gameStart = true;
-	}
+  if (btnp(4)) {
+    player.reset();
+    game.state = game.story;
+    sfx(11, 'C-7', -1, 1, 15, 0);
+  }
+  if (btnp(5)) {
+    game.state = game.play;
+    sfx(11, 'C-7', -1, 1, 15, 0);
+  }
 
-	map(210, 120, 60, 60, 60, 10, 7, 2, null);
+  map(210, 120, 60, 60, 60, 10, 7, 2, null);
 
-	var button1 = 'A';
-	if (!gameState.story) {
-		button1 = 'A';
-	} else if (gameState.gameStartTimer > 90) {
-		button1 = '3';
-		gameState.gameStartTimer--;
-	} else if (gameState.gameStartTimer > 60) {
-		button1 = '2';
-		gameState.gameStartTimer--;
-	} else if (gameState.gameStartTimer > 30) {
-		button1 = '1';
-		gameState.gameStartTimer--;
-	} else {
-		gameState.title = false;
-		playMusic(1);
-	}
-
-	var button2 = 'B';
-	if (!gameState.gameStart) {
-		button2 = 'B';
-	} else if (gameState.gameStartTimer > 90) {
-		button2 = '3';
-		gameState.gameStartTimer--;
-	} else if (gameState.gameStartTimer > 60) {
-		button2 = '2';
-		gameState.gameStartTimer--;
-	} else if (gameState.gameStartTimer > 30) {
-		button2 = '1';
-		gameState.gameStartTimer--;
-	} else {
-		gameState.title = false;
-		playMusic(0);
-	}
-
-	print('press [' + button1 + '] to start', 76, 114);
-	print('press [' + button2 + '] to skip intro', 66, 124);
+  print('press [A] to start', 76, 114);
+  print('press [B] to skip intro', 66, 124);
 }
 
 const gameOverTimer = 60;
 function drawGameOverScreen() {
-	cls();
-	playMusic(1);
+  cls();
 
-	if (btnp(4) && gameOverTimer <= 0) {
-		for (i = 0; i < spawnLocation.length; i++) {
-			spawnLocation[i].used = false;
-		}
-		isFirstRun = true;
-		gameState.story = false;
-		gameState.gameStart = true;
-		gameState.gameWin = false;
-		gameState.title = false;
-		gameState.gameOver = false;
-		gameOverTimer = 60;
-		waveTimer.remaining = 3600;
-		sacrifices = [];
-		init();
-		player.reset();
-	} else if (btnp(5) && gameOverTimer <= 0) {
-		for (i = 0; i < spawnLocation.length; i++) {
-			spawnLocation[i].used = false;
-		}
-		isFirstRun = true;
-		gameState.story = false;
-		gameState.gameStart = true;
-		gameState.gameWin = false;
-		gameState.title = true;
-		gameState.gameOver = false;
-		gameOverTimer = 60;
-		waveTimer.remaining = 3600;
-		sacrifices = [];
-		init();
-		player.reset();
-	} else gameOverTimer--;
+  if (btnp(4) && gameOverTimer <= 0) {
+    init();
+    game.state = game.play;
+  } else if (btnp(5) && gameOverTimer <= 0) {
+    init();
+    game.state = game.title;
+  } else gameOverTimer--;
 
-	var button = 'A';
-	if (!gameState.gameStart) {
-		button = 'A';
-		gameState.gameStartTimer = 120;
-	} else if (gameState.gameStartTimer > 90) {
-		button = '3';
-		gameState.gameStartTimer--;
-	} else if (gameState.gameStartTimer > 60) {
-		button = '2';
-		gameState.gameStartTimer--;
-	} else if (gameState.gameStartTimer > 30) {
-		button = '1';
-		gameState.gameStartTimer--;
-	} else {
-		gameState.gameOver = false;
-		gameOverTimer = 60;
-		playMusic(0);
-	}
-
-	print('YOU FAILED TO CLAIM THE THRONE', 42, 45);
-	print('press [' + button + '] to try again', 68, 65);
-	print('press [B] to give up', 75, 85);
+  print('YOU FAILED TO CLAIM THE THRONE', 42, 45);
+  print('press [A] to try again', 68, 65);
+  print('press [B] to give up', 75, 85);
 }
 
+const storyTimer = 1200
 function drawStory() {
-	cls();
-	waveTimer.remaining = 3600;
+  cls();
 
-	if (gameState.storyTimer > 600) {
-		print('Bastard of man and bull, you have been', 16, 10);
-		print('exiled to a remote labyrinth in Crete.', 20, 20);
-		print('A freak, a menace, an outcast.', 40, 40);
-		print('But while your appearance may seem bestial,', 4, 60);
-		print('your heart...', 86, 70);
-		print('is human...', 176, 120);
-		gameState.storyTimer--;
-	} else {
-		print('But the Gods have shown mercy, giving you', 12, 10);
-		print('the chance to reclaim your humanity', 27, 20);
-		print('by consuming the sacrifices and heroes', 18, 30);
-		print('tossed before you.', 68, 40);
-		print('Even more, as your power grows, you', 28, 60);
-		print('may one day come to rule over those', 27, 70);
-		print('who made you an outcast...', 56, 80);
+  if (storyTimer > 600) {
+    print('Bastard of man and bull, you have been', 16, 10);
+    print('exiled to a remote labyrinth in Crete.', 20, 20);
+    print('A freak, a menace, an outcast.', 40, 40);
+    print('But while your appearance may seem bestial,', 4, 60);
+    print('your heart...', 86, 70);
+    print('is human...', 176, 120);
+    storyTimer--;
+  } else {
+    print('But the Gods have shown mercy, giving you', 12, 10);
+    print('the chance to reclaim your humanity', 27, 20);
+    print('by consuming the sacrifices and heroes', 18, 30);
+    print('tossed before you.', 68, 40);
+    print('Even more, as your power grows, you', 28, 60);
+    print('may one day come to rule over those', 27, 70);
+    print('who made you an outcast...', 56, 80);
 
-		if (btnp(4)) {
-			gameState.gameStart = true;
-			player.reset();
-		}
+    print('press [A] to start', 76, 114);
 
-		var button = 'A';
-		if (!gameState.gameStart) {
-			button = 'A';
-			gameState.gameStartTimer = 120;
-		} else if (gameState.gameStartTimer > 90) {
-			button = '3';
-			gameState.gameStartTimer--;
-		} else if (gameState.gameStartTimer > 60) {
-			button = '2';
-			gameState.gameStartTimer--;
-		} else if (gameState.gameStartTimer > 30) {
-			button = '1';
-			gameState.gameStartTimer--;
-		} else {
-			gameState.story = false;
-			gameState.storyTimer = 1200;
-			playMusic(0);
-		}
-
-		print('press [' + button + '] to start', 76, 114);
-	}
+    if (btnp(4)) {
+      game.state = game.play;
+    }
+  }
 }
 
 const winTimer = 60;
 function drawGameWinScreen() {
-	cls(0);
+  cls(0);
 
-	if (btnp(4) && winTimer <= 0) {
-		for (i = 0; i < spawnLocation.length; i++) {
-			spawnLocation[i].used = false;
-		}
-		isFirstRun = true;
-		gameState.story = false;
-		gameState.gameStart = false;
-		gameState.gameWin = false;
-		gameState.title = true;
-		winTimer = 60;
-		waveTimer.remaining = 3600;
-		player.reset();
-	} else winTimer--;
+  if (btnp(4) && winTimer <= 0) {
+    isFirstRun = true;
+    game.state = game.title;
+  } else winTimer--;
 
-	print('THANK YOU FOR PLAYING', 65, 4);
+  print('THANK YOU FOR PLAYING', 65, 4);
 
-	map(210, 120, 60, 60, 60, 15, 7, 2, null);
+  map(210, 120, 60, 60, 60, 15, 7, 2, null);
 
-	print('YOU HAVE CONSUMED THE NECESSARY SACRIFICES', 3, 118);
-	print('press [A] to play again.', 63, 128);
-}
-
-const isFirstRun = true;
-
-function TIC() {
-	init();
-
-	if (gameState.title) {
-		drawTitleScreen();
-		return;
-	}
-	if (gameState.story) {
-		drawStory();
-		return;
-	}
-	if (gameState.gameOver) {
-		drawGameOverScreen();
-		return;
-	}
-	if (gameState.gameWin) {
-		drawGameWinScreen();
-		return;
-	}
-	cls();
-	//drawTestmap();
-	//most params are default, just manually entered them cuz not sure what they all did tbh
-	map(0, 0, 30, 17, 0, 0, -1, 1, null);
-	updateSacs();
-	updateTimer();
-	drawUI();
-	updatePlayer();
-	drawPlayer();
-	updateWinCondition();
-}
-
-function init() {
-	if (isFirstRun) {
-		populateSacrifices();
-		isFirstRun = false;
-	}
+  print('YOU HAVE CONSUMED THE NECESSARY SACRIFICES', 3, 118);
+  print('press [A] to play again.', 63, 128);
 }
 
 function updatePlayer() {
-	player.stop();
-	player.move();
-	player.attack();
+  player.stop();
+  player.move();
+  player.attack();
 }
 
 function updateWinCondition() {
-	if (gameState.gameStart && waveTimer.remaining > 0 && sacrifices.length <= 0) {
-		gameState.gameStart = false;
-		gameState.title = false;
-		gameState.story = false;
-		gameState.gameOver = false;
-
-		gameState.gameWin = true;
-	}
+  waveTimer.tick(level.difficulty * 1.5);
+  if (waveTimer.remaining > 0 && level.sacrifices.length <= 0) {
+    init();
+    game.state = game.win;
+  } else if (waveTimer.remaining <= 0) {
+    init();
+    game.state = game.gameOver;
+  }
 }
 
-function updateSacs() {
-	var person = void 0;
+function updateSacrifices() {
+  var person = void 0;
 
-	for (var i = 0, len = sacrifices.length; i < len; i++) {
-		person = sacrifices[i];
-		person.stop();
-		person.move();
+  for (var i = 0, len = level.sacrifices.length; i < len; i++) {
+    person = level.sacrifices[i];
+    person.stop();
+    person.move();
 
-		spr(person.spr + i, person.x, person.y, 0);
-	}
-}
-
-function drawPlayer() {
-	spr(player.spr, player.x, player.y, 0);
-}
-
-function updateTimer() {
-	waveTimer.tick(gameState.difficulty);
-	if (waveTimer.remaining <= 0) {
-		gameState.gameOver = true;
-		gameState.gameStart = false;
-		waveTimer.remaining = 3600;
-	}
+    spr(person.spr + i, person.x, person.y, 0);
+  }
 }
 
 function drawUI() {
-	print('TIME:', 164, 0, 1);
-	for (i = 0; i < waveTimer.remaining / 75; i++) {
-		rect(192 + i, 0, 1, 5, 1);
-	}
+  print('TIME:', 164, 0, 1);
+  for (i = 0; i < waveTimer.remaining / 75; i++) {
+    rect(192 + i, 0, 1, 5, 1);
+  }
 
-	print('SACRIFICES: ' + sacrifices.length, 60, 0, 1);
-	print('LVL: ' + gameState.difficulty, 0, 0, 1);
+  print('SACRIFICES: ' + level.sacrifices.length, 60, 0, 1);
+  print('LVL: ' + (level.map.id + 1), 0, 0, 1);
 }
 
 function playMusic(trackNumber) {
-	// tracks are numbered 0-7
-	if (currentMusicTrack != trackNumber) {
-		music(trackNumber);
-		currentMusicTrack = trackNumber;
-	}
+  // tracks are numbered 0-7
+  if (currentMusicTrack != trackNumber) {
+    music(trackNumber);
+    currentMusicTrack = trackNumber;
+  }
 }
 
 // <TILES>
@@ -703,9 +628,11 @@ function playMusic(trackNumber) {
 // <SFX>
 // 000:00f000c010904060c000d000d000e000e000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000100000000000
 // 001:03f003e013d023c043b063a08390b380c370e360e300f300f300f300f300f300f300f300f300f300f300f300f300f300f300f300f300f300f300f300300000000000
-// 002:64005400b400e400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400704000000000
+// 002:64005400b400e400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400f400700000000000
 // 003:510041003100310031003100310041004100410041004100410051005100510061006100610061006100610061006100610061006100610061006100300000000000
-// 004:05000500050005000500050005000500050005000500050005000500050005000500050005000500050005000500050005000500050005000500050040a000000000
+// 004:050005000500050005000500050005000500050005000500050005000500050005000500050005000500050005000500050005000500050005000500400000000000
+// 010:c660b660c660c650c640c630d620d620d610e610e610e600f600f600f600f600f600f600f600f600f600f600f600f600f600f600f600f600f600f600400000000000
+// 011:410021002100114011401140217031704170f100f100f100f100f100f100f100f100f100f100f100f100f100f100f100f100f100f100f100f100f100600000000000
 // </SFX>
 
 // <PATTERNS>
@@ -728,4 +655,3 @@ function playMusic(trackNumber) {
 // <PALETTE>
 // 000:140c1cb2bab230346d847e6f854c30346524d04648757161597dced27d2c8595a16daa2cd2aa996dc2cadad45edeeed6
 // </PALETTE>
-
