@@ -49,6 +49,7 @@ const isFirstRun = true;
 const level = null;
 const currentMusicTrack = -1;
 const game = new Game();
+const weapons = [axe]
 const player = new Player(256, 8, 16, [0, 1, 2, 3, 4, 5, 6, 7, 8]);
 const mover = new MovementController();
 
@@ -331,10 +332,11 @@ function Player(sprite, startx, starty, buttons) {
   this.attacking = false;
   this.speed = 0.5;
   this.halted = false;
-  this.weapon = axe;
+  this.weapon = weapons[0];
   this.draw = function () {
     spr(this.spr, this.x, this.y, 0);
   };
+
   this.reset = function () {
     this.x = 8;
     this.y = 16;
