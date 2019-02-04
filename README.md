@@ -1,25 +1,43 @@
-# LD43
+![Minotaur Mania!](https://static.jam.vg/raw/9cc/b/z/1dd58.png)
 
-Ludum Dare 43 Entry
+# Minotaur Mania!
+Bastard of man and bull, you’ve been exiled to a remote labyrinth in Crete. A freak, a menace, an outcast.
 
-### Links
+Your appearance may seem bestial, but your heart
 
-- [TIC-80](https://github.com/nesbox/TIC-80?fbclid=IwAR2sHjSS03ydvSTkXU8EWMM7ju6H3pkxYSIltIXJu6BPQD2LVagZ95VB8tw)
-- [Tutorials](https://github.com/nesbox/TIC-80/wiki/tutorials)
+…is human.
 
-### Get it Running on Windows (node)
+The Gods have shown mercy, giving you the chance to reclaim your humanity by consuming the sacrifices and heroes tossed before you.
 
-- npm start
+But even more, the chance to reign over the very people that made you an outcast…
 
-### Get it Running on Windows (vscode with TIC-80 Pro)
+## How To Play
+#### Keys
 
-- Install [this VSCode extension](https://marketplace.visualstudio.com/items?itemName=justinwash.tic80-pro-vscode)
-- From your .js/lua/etc file hit F1 > 'Run Cart In TIC-80 Pro'
+* Arrow keys - Move yourself toward those sacrificed to your labyrinth.
+* Z - Swing your giant frickin’ axe at ‘em.
+NOTE: A and B are Z and X on the keyboard!
 
-### Get it Running everywhere else
+#### Goal
 
-- Open TIC-80
-- Console command 'cd /..' (NOT '../') to escape the SAFE ZONE
-- navigate to the folder containing the cart
-- Console command 'load [cart_name].[tic/js/lua]'
-- Ctrl+R (or Console command 'run') to start the game
+Consume all the sacrifices sent into your labyrinth before they escape!
+
+## Credits:
+
+* Science aka I Lei down aka Auron - Slave driver, player, game-state code
+
+* Mustache aka Yung Crisis aka Bazooka Jo - Mustache possession, sacrifice generation code
+
+* Bryan aka Brian - The idea, collision code
+
+* E-muy-lio Gordo aka Google Spy aka hoka hola - JS knowledge, sacrifice base code
+
+* Snake nazty aka the CHUCK “the snake” DIESEL - Story, level creation
+
+* BEEF BOI aka Sir Loinz aka Big Body Gotti - Cover art, sprites
+
+* Luigi Mane aka Ric Schneeds - Sound fx, music
+
+* Vladi Pu aka Google Fi Bot aka Feng gang and
+
+* Zvechnovovich aka Hard bass adidas - Moral support
